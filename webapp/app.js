@@ -106,6 +106,20 @@ function updateCartFab() {
 }
 
 /* ── Cart screen ──────────────────────────────────────────────── */
+document.getElementById("cart-items").addEventListener("click", e => {
+  const plus = e.target.closest(".qty-btn.plus");
+  const minus = e.target.closest(".qty-btn.minus");
+  if (!plus && !minus) return;
+  const id = parseInt((plus || minus).dataset.id);
+  if (plus) { cart[id].qty++; }
+  else {
+    cart[id].qty--;
+    if (cart[id].qty === 0) delete cart[id];
+  }
+  renderCart();
+  updateCartFab();
+});
+
 function renderCart() {
   const container = document.getElementById("cart-items");
   const entries = Object.values(cart);
@@ -126,20 +140,6 @@ function renderCart() {
           <button class="qty-btn plus" data-id="${item.id}">+</button>
         </div>
       </div>`).join("");
-
-    container.addEventListener("click", e => {
-      const plus = e.target.closest(".qty-btn.plus");
-      const minus = e.target.closest(".qty-btn.minus");
-      if (!plus && !minus) return;
-      const id = parseInt((plus || minus).dataset.id);
-      if (plus) { cart[id].qty++; }
-      else {
-        cart[id].qty--;
-        if (cart[id].qty === 0) delete cart[id];
-      }
-      renderCart();
-      updateCartFab();
-    }, { once: true });
   }
 
   updatePriceSummary();

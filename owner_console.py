@@ -28,7 +28,7 @@ USD_RATE = 4_000  # 1 USD = 4000 riel, statis
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
 def riel(n: int) -> str:
-    return f"{n:,}₭"
+    return f"{n:,}៛"
 
 
 def _order_text(o: dict) -> str:
@@ -120,7 +120,7 @@ async def cmd_order(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         return
     args = ctx.args
     if not args or not args[0].isdigit():
-        await update.message.reply_text("Usage: /order <id>")
+        await update.message.reply_text("Cara pakai: /order <id>")
         return
     o = get_order(int(args[0]))
     if not o:
@@ -142,7 +142,7 @@ async def cmd_omzet(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         bulan = int(args[0]) if args else now.month
         tahun = int(args[1]) if len(args or []) > 1 else now.year
     except ValueError:
-        await update.message.reply_text("Usage: /omzet [bulan] [tahun]\nContoh: /omzet 6 2026")
+        await update.message.reply_text("Cara Pakai: /omzet [bulan] [tahun]\nContoh: /omzet 6 2026")
         return
 
     d = get_omzet(bulan, tahun)
@@ -223,7 +223,7 @@ async def cmd_push(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         return
     args = ctx.args
     if not args or not args[0].isdigit():
-        await update.message.reply_text("Usage: /push <user_id> [pesan opsional]")
+        await update.message.reply_text("Cara Pakai: /push <user_id> [pesan opsional]")
         return
     target_uid = int(args[0])
     msg = " ".join(args[1:]) if len(args) > 1 else "Ada promo spesial buat kamu hari ini!"

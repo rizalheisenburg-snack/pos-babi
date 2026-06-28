@@ -1,7 +1,10 @@
 """HTTP server — aiohttp. Melayani API + static webapp."""
 from __future__ import annotations
 import json
+import logging
 import pathlib
+
+log = logging.getLogger(__name__)
 
 from aiohttp import web
 
@@ -53,14 +56,18 @@ async def api_checkout(request):
     user = _auth(request)
     if not user:
         return _json({"ok": False, "error": "Unauthorized"}, 401)
-    body = await request.json()
-    result = checkout(
-        user=user,
-        items=body.get("items", []),
-        use_voucher=bool(body.get("use_voucher", False)),
-        note=body.get("note", ""),
-    )
-    return _json(result, 200 if result["ok"] else 400)
+    try:
+        body = await request.json()
+        result = checkout(
+            user=user,
+            items=body.get("items", []),
+            use_voucher=bool(body.get("use_voucher", False)),
+            note=body.get("note", ""),
+        )
+        return _json(result, 200 if result["ok"] else 400)
+    except Exception as e:
+        log.exception("checkout error")
+        return _json({"ok": False, "error": f"Server error: {e}"}, 500)
 
 
 @routes.post("/api/checkout/confirm-partial")

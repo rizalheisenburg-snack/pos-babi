@@ -19,7 +19,7 @@ async function api(path, opts = {}) {
   return res.json();
 }
 
-const riel = n => `${Number(n).toLocaleString("km-KH")}₭`;
+const riel = n => `${Number(n).toLocaleString("km-KH")}៛`;
 
 function show(id) {
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));

@@ -1,7 +1,7 @@
 """Inject/replace menu dengan daftar menu restoran baru. Aman dijalanin ulang."""
 from db import get_conn, init_db
 
-IMG = "?w=400&q=80"
+IMG = "?w=200&q=60&auto=format"
 
 # ── URL gambar per jenis makanan ──────────────────────────────────────────────
 _NOODLE_SOUP = [

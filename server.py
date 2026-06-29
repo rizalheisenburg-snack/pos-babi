@@ -172,7 +172,10 @@ async def static_files(request):
     path = WEBAPP_DIR / tail
     if not path.exists() or not path.is_file():
         path = WEBAPP_DIR / "index.html"
-    return web.FileResponse(path)
+    # JS/CSS/img di-cache 1 jam, HTML tidak (supaya update langsung keliatan)
+    is_html = path.suffix == ".html"
+    headers = {} if is_html else {"Cache-Control": "public, max-age=3600"}
+    return web.FileResponse(path, headers=headers)
 
 
 def build_app(bot=None) -> web.Application:

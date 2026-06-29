@@ -179,26 +179,21 @@ document.getElementById("btn-toggle-voucher").addEventListener("click", () => {
 });
 
 /* ── Checkout ─────────────────────────────────────────────────── */
-document.getElementById("btn-checkout").addEventListener("click", async () => {
-  const btn = document.getElementById("btn-checkout");
-  btn.disabled = true;
-  btn.textContent = "Memproses...";
-
+async function doCheckout(payMethod) {
   const items = Object.values(cart).map(({ item, qty }) => ({ item_id: item.id, qty }));
-  const note = document.getElementById("note-input").value.trim();
+  const noteBase = document.getElementById("note-input").value.trim();
+  const note = payMethod === "ABA" ? `[Transfer ABA] ${noteBase}`.trim() : noteBase;
 
   const result = await api("/api/checkout", {
     method: "POST",
     body: JSON.stringify({ items, use_voucher: useVoucher, note }),
   });
 
-  btn.disabled = false;
-  btn.textContent = "Pesan Sekarang";
-
   if (result.ok) {
     clearCart();
     showSuccess(result);
   } else if (result.error === "TOPUP_REQUIRED") {
+    show("screen-cart");
     const msg = document.getElementById("voucher-msg");
     msg.className = "voucher-msg err";
     msg.textContent = result.message;
@@ -210,6 +205,27 @@ document.getElementById("btn-checkout").addEventListener("click", async () => {
   } else {
     tg?.showAlert?.(result.error || "Checkout gagal, coba lagi.");
   }
+}
+
+document.getElementById("btn-pay-cash").addEventListener("click", async () => {
+  const btn = document.getElementById("btn-pay-cash");
+  btn.disabled = true; btn.textContent = "Memproses...";
+  await doCheckout("CASH");
+  btn.disabled = false; btn.textContent = "💵 Cash";
+});
+
+document.getElementById("btn-pay-aba").addEventListener("click", () => {
+  const total = cartSubtotal() - (useVoucher ? 10_000 : 0);
+  document.getElementById("aba-total").textContent = riel(Math.max(0, total));
+  stopPolling();
+  show("screen-aba");
+});
+
+document.getElementById("btn-aba-confirm").addEventListener("click", async () => {
+  const btn = document.getElementById("btn-aba-confirm");
+  btn.disabled = true; btn.textContent = "Memproses...";
+  await doCheckout("ABA");
+  btn.disabled = false; btn.textContent = "✅ Sudah Transfer";
 });
 
 function clearCart() {
@@ -345,7 +361,7 @@ async function _fetchOrderDetail(id) {
 /* ── Polling ──────────────────────────────────────────────────── */
 let _pollTimer = null;
 
-function startPolling(fn, ms = 5000) {
+function startPolling(fn, ms = 3000) {
   stopPolling();
   fn(); // langsung fetch sekali
   _pollTimer = setInterval(fn, ms);
@@ -385,6 +401,9 @@ document.querySelectorAll(".back-btn[data-target]").forEach(btn => {
       document.getElementById("orders-list").innerHTML = "";
       show("screen-orders");
       startPolling(loadOrders);
+    } else if (btn.dataset.target === "screen-cart") {
+      renderCart();
+      show("screen-cart");
     } else {
       show(btn.dataset.target);
     }

@@ -57,7 +57,24 @@
       <div class="price-row total-row"><span>Total</span><span id="sum-total">0៛</span></div>
     </div>
 
-    <button id="btn-checkout" class="btn-primary">Pesan Sekarang</button>
+    <div class="pay-method-row">
+      <button id="btn-pay-cash" class="btn-pay-method">💵 Cash</button>
+      <button id="btn-pay-aba"  class="btn-pay-method aba">🏦 ABA</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── ABA BARCODE ────────────────────────────────────────────── -->
+<div id="screen-aba" class="screen">
+  <div class="topbar">
+    <button class="icon-btn back-btn" data-target="screen-cart">← Kembali</button>
+    <span class="topbar-title">Transfer ABA</span>
+  </div>
+  <div class="aba-inner">
+    <p class="aba-hint">Scan QR di bawah lalu tap <strong>Sudah Transfer</strong></p>
+    <img src="aba-qr.png" alt="ABA QR Code" class="aba-qr" />
+    <p id="aba-total" class="aba-total"></p>
+    <button id="btn-aba-confirm" class="btn-primary">✅ Sudah Transfer</button>
   </div>
 </div>
 

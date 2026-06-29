@@ -72,8 +72,8 @@ def _order_keyboard(order_id: int, status: str, payment_status: str) -> InlineKe
     # Tombol lunas (kalau belum bayar dan order masih aktif)
     if payment_status == "UNPAID" and status not in ("REJECTED", "CANCELLED"):
         rows.append([
-            InlineKeyboardButton("💵 Lunas RIEL",  callback_data=f"paid:{order_id}:RIEL"),
-            InlineKeyboardButton("💵 Lunas USD",   callback_data=f"paid:{order_id}:USD"),
+            InlineKeyboardButton("💵 Lunas",  callback_data=f"paid:{order_id}:RIEL"),
+           
         ])
 
     rows.append([InlineKeyboardButton("🔄 Refresh", callback_data=f"refresh:{order_id}")])

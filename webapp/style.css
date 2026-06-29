@@ -269,6 +269,39 @@ html, body {
   font-size: 15px; font-weight: 600; cursor: pointer;
 }
 
+/* ── Payment method buttons ───────────────────────────────────── */
+.pay-method-row {
+  display: flex; gap: 10px; margin-top: 14px;
+}
+.btn-pay-method {
+  flex: 1; padding: 14px;
+  background: var(--btn); color: var(--btn-text);
+  border: none; border-radius: 12px;
+  font-size: 15px; font-weight: 700; cursor: pointer;
+  transition: opacity .15s;
+}
+.btn-pay-method:active { opacity: .8; }
+.btn-pay-method.aba {
+  background: #1a56db; color: #fff;
+}
+
+/* ── ABA screen ───────────────────────────────────────────────── */
+.aba-inner {
+  display: flex; flex-direction: column;
+  align-items: center; padding: 24px 20px;
+  flex: 1;
+}
+.aba-hint { color: var(--hint); font-size: 14px; text-align: center; margin-bottom: 20px; }
+.aba-qr {
+  width: min(80vw, 280px); height: min(80vw, 280px);
+  object-fit: contain; border-radius: 16px;
+  box-shadow: var(--shadow);
+}
+.aba-total {
+  font-size: 22px; font-weight: 800;
+  color: var(--accent); margin: 16px 0 0;
+}
+
 /* ── Success screen ───────────────────────────────────────────── */
 #screen-success {
   align-items: center; justify-content: center;

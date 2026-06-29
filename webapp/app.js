@@ -165,8 +165,20 @@ function updatePriceSummary() {
 /* ── Voucher toggle (sementara dinonaktifkan) ─────────────────── */
 // document.getElementById("btn-toggle-voucher").addEventListener("click", () => { ... });
 
-/* ── Address chips ────────────────────────────────────────────── */
+/* ── Address picker ───────────────────────────────────────────── */
 let selectedAddr = "KD";
+
+function _updateAddrBtn(label) {
+  document.getElementById("btn-addr-pick").textContent = label + " ▾";
+}
+
+function _closePicker() {
+  document.getElementById("addr-picker").classList.add("hidden");
+}
+
+document.getElementById("btn-addr-pick").addEventListener("click", () => {
+  document.getElementById("addr-picker").classList.toggle("hidden");
+});
 
 document.querySelectorAll(".addr-chip").forEach(chip => {
   chip.addEventListener("click", () => {
@@ -174,6 +186,8 @@ document.querySelectorAll(".addr-chip").forEach(chip => {
     chip.classList.add("active");
     selectedAddr = chip.dataset.addr;
     document.getElementById("addr-custom").value = "";
+    _updateAddrBtn(selectedAddr);
+    _closePicker();
   });
 });
 
@@ -181,11 +195,12 @@ document.getElementById("addr-custom").addEventListener("input", e => {
   if (e.target.value.trim()) {
     document.querySelectorAll(".addr-chip").forEach(c => c.classList.remove("active"));
     selectedAddr = e.target.value.trim();
+    _updateAddrBtn(selectedAddr);
   } else {
-    // kembali ke chip pertama kalau input dikosongkan
     const first = document.querySelector(".addr-chip");
     first.classList.add("active");
     selectedAddr = first.dataset.addr;
+    _updateAddrBtn(selectedAddr);
   }
 });
 
@@ -247,6 +262,8 @@ function clearCart() {
     document.querySelectorAll(".addr-chip").forEach(c => c.classList.remove("active"));
     firstChip.classList.add("active");
     selectedAddr = firstChip.dataset.addr;
+    _updateAddrBtn(selectedAddr);
+    _closePicker();
   }
   updateCartFab();
 }

@@ -46,18 +46,23 @@
     <!-- <div id="voucher-msg" class="voucher-msg"></div> -->
 
     <div class="address-section">
-      <p class="address-label">📍 Pilih Lokasi Antar</p>
-      <div class="address-chips">
-        <button class="addr-chip active" data-addr="KD">KD</button>
-        <button class="addr-chip" data-addr="HP TOWER">HP TOWER</button>
-        <button class="addr-chip" data-addr="AVENUE">AVENUE</button>
-        <button class="addr-chip" data-addr="WON">WON</button>
-        <button class="addr-chip" data-addr="THE RICH">THE RICH</button>
-        <button class="addr-chip" data-addr="TRIUMPH">TRIUMPH</button>
-        <button class="addr-chip" data-addr="SV HOTEL">SV HOTEL</button>
-        <button class="addr-chip" data-addr="BOYA">BOYA</button>
+      <div class="addr-row">
+        <span class="addr-label-inline">📍 Tujuan:</span>
+        <button id="btn-addr-pick" class="btn-addr-pick">KD ▾</button>
       </div>
-      <input id="addr-custom" class="addr-input" type="text" placeholder="Alamat lain (jarang diantar)..." />
+      <div class="addr-picker hidden" id="addr-picker">
+        <div class="address-chips">
+          <button class="addr-chip active" data-addr="KD">KD</button>
+          <button class="addr-chip" data-addr="HP TOWER">HP TOWER</button>
+          <button class="addr-chip" data-addr="AVENUE">AVENUE</button>
+          <button class="addr-chip" data-addr="WON">WON</button>
+          <button class="addr-chip" data-addr="THE RICH">THE RICH</button>
+          <button class="addr-chip" data-addr="TRIUMPH">TRIUMPH</button>
+          <button class="addr-chip" data-addr="SV HOTEL">SV HOTEL</button>
+          <button class="addr-chip" data-addr="BOYA">BOYA</button>
+        </div>
+        <input id="addr-custom" class="addr-input" type="text" placeholder="Alamat lain (jarang diantar)..." />
+      </div>
     </div>
 
     <div class="note-row">

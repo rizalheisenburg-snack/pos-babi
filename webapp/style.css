@@ -272,7 +272,22 @@ html, body {
 
 /* ── Address picker ───────────────────────────────────────────── */
 .address-section { margin-bottom: 12px; }
-.address-label { font-size: 13px; font-weight: 700; color: var(--hint); margin-bottom: 8px; }
+.addr-row {
+  display: flex; align-items: center; gap: 10px;
+}
+.addr-label-inline {
+  font-size: 13px; font-weight: 700; color: var(--hint); white-space: nowrap;
+}
+.btn-addr-pick {
+  padding: 7px 14px; border-radius: 20px; font-size: 13px; font-weight: 700;
+  border: 1.5px solid var(--accent); background: var(--accent); color: #fff;
+  cursor: pointer; transition: opacity .15s; letter-spacing: .01em;
+}
+.btn-addr-pick:active { opacity: .8; }
+.addr-picker {
+  margin-top: 10px;
+}
+.addr-picker.hidden { display: none; }
 .address-chips {
   display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px;
 }

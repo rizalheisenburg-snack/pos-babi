@@ -162,23 +162,8 @@ function updatePriceSummary() {
   document.getElementById("discount-row").classList.toggle("hidden", !useVoucher);
 }
 
-/* ── Voucher toggle ───────────────────────────────────────────── */
-document.getElementById("btn-toggle-voucher").addEventListener("click", () => {
-  const sub = cartSubtotal();
-  if (!useVoucher && sub < 10_000 && sub > 0) {
-    const topup = 10_000 - sub;
-    const msg = document.getElementById("voucher-msg");
-    msg.className = "voucher-msg err";
-    msg.textContent = `Belanja kurang ${riel(topup)} lagi untuk pakai voucher, atau lanjut bayar penuh.`;
-    return;
-  }
-  useVoucher = !useVoucher;
-  const btn = document.getElementById("btn-toggle-voucher");
-  btn.textContent = useVoucher ? "✅ Voucher Dipakai" : "🎟 Pakai Voucher";
-  btn.classList.toggle("active", useVoucher);
-  document.getElementById("voucher-msg").textContent = "";
-  updatePriceSummary();
-});
+/* ── Voucher toggle (sementara dinonaktifkan) ─────────────────── */
+// document.getElementById("btn-toggle-voucher").addEventListener("click", () => { ... });
 
 /* ── Address chips ────────────────────────────────────────────── */
 let selectedAddr = "KD";

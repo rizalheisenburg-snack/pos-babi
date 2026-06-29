@@ -146,7 +146,9 @@ function renderCart() {
   }
 
   updatePriceSummary();
-  document.getElementById("btn-checkout").disabled = !entries.length;
+  const empty = !entries.length;
+  document.getElementById("btn-pay-cash").disabled = empty;
+  document.getElementById("btn-pay-aba").disabled  = empty;
 }
 
 function updatePriceSummary() {

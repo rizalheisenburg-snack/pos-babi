@@ -162,8 +162,29 @@ function updatePriceSummary() {
   document.getElementById("discount-row").classList.toggle("hidden", !useVoucher);
 }
 
-/* ── Voucher toggle (sementara dinonaktifkan) ─────────────────── */
-// document.getElementById("btn-toggle-voucher").addEventListener("click", () => { ... });
+/* ── Voucher toggle ───────────────────────────────────────────── */
+document.getElementById("btn-toggle-voucher").addEventListener("click", () => {
+  useVoucher = !useVoucher;
+  const btn = document.getElementById("btn-toggle-voucher");
+  const msg = document.getElementById("voucher-msg");
+  btn.classList.toggle("active", useVoucher);
+  if (useVoucher) {
+    const sub = cartSubtotal();
+    if (sub < 10_000) {
+      useVoucher = false;
+      btn.classList.remove("active");
+      msg.className = "voucher-msg err";
+      msg.textContent = `Belanja minimal 10.000៛ untuk pakai voucher (kurang ${(10_000 - sub).toLocaleString("km-KH")}៛)`;
+    } else {
+      msg.className = "voucher-msg ok";
+      msg.textContent = "Voucher 10.000៛ aktif!";
+    }
+  } else {
+    msg.className = "voucher-msg";
+    msg.textContent = "";
+  }
+  updatePriceSummary();
+});
 
 /* ── Address picker ───────────────────────────────────────────── */
 let selectedAddr = "KD";
@@ -255,6 +276,10 @@ document.getElementById("btn-aba-confirm").addEventListener("click", async () =>
 function clearCart() {
   Object.keys(cart).forEach(k => delete cart[k]);
   useVoucher = false;
+  document.getElementById("btn-toggle-voucher").classList.remove("active");
+  const msg = document.getElementById("voucher-msg");
+  msg.className = "voucher-msg";
+  msg.textContent = "";
   document.getElementById("note-input").value = "";
   document.getElementById("addr-custom").value = "";
   const firstChip = document.querySelector(".addr-chip");

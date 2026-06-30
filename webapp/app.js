@@ -260,8 +260,11 @@ document.getElementById("btn-pay-cash").addEventListener("click", async () => {
 });
 
 document.getElementById("btn-pay-aba").addEventListener("click", () => {
-  const total = cartSubtotal() - (useVoucher ? 10_000 : 0);
-  document.getElementById("aba-total").textContent = riel(Math.max(0, total));
+  const total = Math.max(0, cartSubtotal() - (useVoucher ? 10_000 : 0));
+  const usd = total / 4000;
+  const usdStr = usd % 1 === 0 ? `$${usd}` : `$${usd.toFixed(usd < 1 ? 2 : 1)}`;
+  document.getElementById("aba-total").textContent = riel(total);
+  document.getElementById("aba-total-usd").textContent = `≈ ${usdStr}`;
   stopPolling();
   show("screen-aba");
 });

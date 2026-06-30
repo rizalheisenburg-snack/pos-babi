@@ -66,12 +66,12 @@ MENU = [
     ("Sapo Tahu Babi (Chinese Style)",  "", 15_000, "Chinese Food & Seafood", "🍤", None),
 
     # ── SAYUR & PELENGKAP ──────────────────────────────────────────────────────
-    ("Capcay Goreng Ayam",              "", 15_000, "Sayur & Pelengkap", "🥦", None),
-    ("Capcay Kuah Ayam",                "", 15_000, "Sayur & Pelengkap", "🥦", None),
+    ("Capcay Goreng Ayam",              "", 15_000, "Chinese Food & Seafood", "🥦", None),
+    ("Capcay Kuah Ayam",                "", 15_000, "Chinese Food & Seafood", "🥦", None),
     ("Capcay Polos",                    "", 3_000,  "Sayur & Pelengkap", "🥦", None),
     ("Capcay Babi",                     "", 4_000,  "Sayur & Pelengkap", "🥦", None),
     ("Cah Kangkung",                    "", 10_000, "Sayur & Pelengkap", "🥦", None),
-    ("Kangkung Cah Terasi",             "", 12_000, "Sayur & Pelengkap", "🥦", None),
+    ("Kangkung Cah Terasi",             "", 12_000, "Chinese Food & Seafood", "🥦", None),
     ("Sapo Tahu Polos",                 "", 3_000,  "Sayur & Pelengkap", "🥦", None),
     ("Sapo Tahu Babi",                  "", 4_000,  "Sayur & Pelengkap", "🥦", None),
     ("Sayur Asin Cah Tahu",             "", 3_000,  "Sayur & Pelengkap", "🥦", None),
@@ -80,7 +80,7 @@ MENU = [
     ("Semur Telor",                     "", 3_000,  "Sayur & Pelengkap", "🥦", None),
     ("Toge Tumis Tahu",                 "", 3_000,  "Sayur & Pelengkap", "🥦", None),
     ("Toge Cah Bawang Putih",           "", 10_000, "Sayur & Pelengkap", "🥦", None),
-    ("Toge Cah Ikan Asin",              "", 12_000, "Sayur & Pelengkap", "🥦", None),
+    ("Toge Cah Ikan Asin",              "", 12_000, "Chinese Food & Seafood", "🥦", None),
     ("Fu Yung Hai",                     "", 5_000,  "Sayur & Pelengkap", "🥚", None),
     ("Nasi Putih",                      "", 2_000,  "Sayur & Pelengkap", "🍚", None),
 

@@ -339,6 +339,15 @@ html, body {
   font-size: 22px; font-weight: 800;
   color: var(--accent); margin: 16px 0 0;
 }
+.aba-order-id { font-size: 14px; font-weight: 700; color: var(--hint); margin-bottom: 4px; }
+.aba-note { color: var(--hint); font-size: 12px; text-align: center; margin: 12px 0 0; }
+.aba-btn-row { width: 100%; margin-top: 16px; }
+
+#screen-aba-proof .success-inner a.btn-primary {
+  display: block; box-sizing: border-box;
+  text-align: center; text-decoration: none;
+}
+#screen-aba-proof .success-inner p { margin-bottom: 20px; }
 
 /* ── Success screen ───────────────────────────────────────────── */
 #screen-success {

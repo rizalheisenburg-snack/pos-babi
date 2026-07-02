@@ -226,7 +226,7 @@ document.getElementById("addr-custom").addEventListener("input", e => {
 });
 
 /* ── Checkout ─────────────────────────────────────────────────── */
-async function doCheckout(payMethod) {
+async function doCheckout(payMethod, onSuccess = showSuccess) {
   const items = Object.values(cart).map(({ item, qty }) => ({ item_id: item.id, qty }));
   const noteBase = document.getElementById("note-input").value.trim();
   const addr = document.getElementById("addr-custom").value.trim() || selectedAddr;
@@ -240,7 +240,7 @@ async function doCheckout(payMethod) {
 
   if (result.ok) {
     clearCart();
-    showSuccess(result);
+    onSuccess(result);
   } else if (result.error === "TOPUP_REQUIRED") {
     show("screen-cart");
     useVoucher = false;
@@ -259,21 +259,40 @@ document.getElementById("btn-pay-cash").addEventListener("click", async () => {
   btn.disabled = false; btn.textContent = "💵 Cash";
 });
 
-document.getElementById("btn-pay-aba").addEventListener("click", () => {
-  const total = Math.max(0, cartSubtotal() - (useVoucher ? 10_000 : 0));
-  const usd = total / 4000;
-  const usdStr = usd % 1 === 0 ? `$${usd}` : `$${usd.toFixed(usd < 1 ? 2 : 1)}`;
-  document.getElementById("aba-total").textContent = riel(total);
-  document.getElementById("aba-total-usd").textContent = `≈ ${usdStr}`;
+document.getElementById("btn-pay-aba").addEventListener("click", async () => {
+  const btn = document.getElementById("btn-pay-aba");
+  btn.disabled = true; btn.textContent = "Memproses...";
   stopPolling();
-  show("screen-aba");
+  document.getElementById("btn-aba-back").dataset.target = "screen-cart";
+  await doCheckout("ABA", showAbaScreen);
+  btn.disabled = false; btn.textContent = "🏦 ABA";
 });
 
-document.getElementById("btn-aba-confirm").addEventListener("click", async () => {
-  const btn = document.getElementById("btn-aba-confirm");
-  btn.disabled = true; btn.textContent = "Memproses...";
-  await doCheckout("ABA");
-  btn.disabled = false; btn.textContent = "✅ Sudah Transfer";
+function showAbaScreen(result) {
+  const total = result.total;
+  const usd = total / 4000;
+  const usdStr = usd % 1 === 0 ? `$${usd}` : `$${usd.toFixed(usd < 1 ? 2 : 1)}`;
+  const screen = document.getElementById("screen-aba");
+  screen.dataset.orderId = result.order_id;
+  screen.dataset.total = total;
+  document.getElementById("aba-order-id").textContent = "Order #" + result.order_id;
+  document.getElementById("aba-total").textContent = riel(total);
+  document.getElementById("aba-total-usd").textContent = `≈ ${usdStr}`;
+  show("screen-aba");
+}
+
+document.getElementById("btn-aba-sudah").addEventListener("click", () => {
+  show("screen-aba-proof");
+});
+
+document.getElementById("btn-aba-nanti").addEventListener("click", () => {
+  const screen = document.getElementById("screen-aba");
+  showSuccess({ order_id: screen.dataset.orderId, total: Number(screen.dataset.total) });
+});
+
+document.getElementById("btn-aba-proof-lanjut").addEventListener("click", () => {
+  const screen = document.getElementById("screen-aba");
+  showSuccess({ order_id: screen.dataset.orderId, total: Number(screen.dataset.total) });
 });
 
 function clearCart() {
@@ -370,7 +389,10 @@ document.getElementById("orders-list").addEventListener("click", e => {
   if (card) loadOrderDetail(parseInt(card.dataset.id));
 });
 
+let _currentDetailOrderId = null;
+
 async function loadOrderDetail(id) {
+  _currentDetailOrderId = id;
   document.getElementById("detail-title").textContent = "Order #" + id;
   document.getElementById("order-detail-body").innerHTML = "";
   show("screen-order-detail");
@@ -401,6 +423,11 @@ async function _fetchOrderDetail(id) {
     ? `<div class="detail-row green"><span>Pembayaran</span><span>Lunas (${o.paid_currency || ""})</span></div>`
     : `<div class="detail-row" style="color:var(--red)"><span>Pembayaran</span><span>Belum Bayar</span></div>`;
 
+  const isAba = (o.note || "").includes("[Transfer ABA]");
+  const transferBtnHtml = isAba && o.payment_status !== "PAID"
+    ? `<button id="btn-detail-aba-transfer" class="btn-primary">Transfer Sekarang</button>`
+    : "";
+
   body.innerHTML = `
     <div class="detail-status-big">${o.status_label}</div>
     <div class="detail-items">
@@ -413,7 +440,17 @@ async function _fetchOrderDetail(id) {
       <div class="detail-row detail-total"><span>Total</span><span>${riel(o.total)}</span></div>
       ${payHtml}
       ${o.note ? `<div class="detail-note">📝 ${o.note}</div>` : ""}
-    </div>`;
+    </div>
+    ${transferBtnHtml}`;
+
+  const transferBtn = document.getElementById("btn-detail-aba-transfer");
+  if (transferBtn) {
+    transferBtn.addEventListener("click", () => {
+      stopPolling();
+      document.getElementById("btn-aba-back").dataset.target = "screen-order-detail";
+      showAbaScreen({ order_id: o.id, total: o.total });
+    });
+  }
 }
 
 /* ── Polling ──────────────────────────────────────────────────── */
@@ -462,6 +499,9 @@ document.querySelectorAll(".back-btn[data-target]").forEach(btn => {
     } else if (btn.dataset.target === "screen-cart") {
       renderCart();
       show("screen-cart");
+    } else if (btn.dataset.target === "screen-order-detail" && _currentDetailOrderId != null) {
+      show("screen-order-detail");
+      startPolling(() => _fetchOrderDetail(_currentDetailOrderId));
     } else {
       show(btn.dataset.target);
     }

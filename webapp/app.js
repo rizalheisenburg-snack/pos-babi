@@ -275,6 +275,7 @@ function showAbaScreen(result) {
   const screen = document.getElementById("screen-aba");
   screen.dataset.orderId = result.order_id;
   screen.dataset.total = total;
+  screen.dataset.voucherUsed = result.voucher_value > 0 ? "1" : "0";
   document.getElementById("aba-order-id").textContent = "Order #" + result.order_id;
   document.getElementById("aba-total").textContent = riel(total);
   document.getElementById("aba-total-usd").textContent = `≈ ${usdStr}`;
@@ -282,6 +283,10 @@ function showAbaScreen(result) {
 }
 
 document.getElementById("btn-aba-sudah").addEventListener("click", () => {
+  const voucherUsed = document.getElementById("screen-aba").dataset.voucherUsed === "1";
+  document.getElementById("aba-proof-text").textContent = voucherUsed
+    ? "Cek chat kamu dengan bot ini — ada pesan rincian order & voucher dari bot. Reply pesan itu dengan screenshot bukti transfer ABA kamu ya 🙏"
+    : "Cek chat kamu dengan bot ini — ada pesan rincian order dari bot. Reply pesan itu dengan screenshot bukti transfer ABA kamu ya 🙏";
   show("screen-aba-proof");
 });
 

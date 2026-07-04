@@ -279,6 +279,16 @@ function showAbaScreen(result) {
   document.getElementById("aba-order-id").textContent = "Order #" + result.order_id;
   document.getElementById("aba-total").textContent = riel(total);
   document.getElementById("aba-total-usd").textContent = `≈ ${usdStr}`;
+
+  const voucherInfo = document.getElementById("aba-voucher-info");
+  if (result.voucher_value > 0) {
+    document.getElementById("aba-subtotal").textContent = riel(result.subtotal);
+    document.getElementById("aba-voucher-discount").textContent = `-${riel(result.voucher_value)}`;
+    voucherInfo.classList.remove("hidden");
+  } else {
+    voucherInfo.classList.add("hidden");
+  }
+
   show("screen-aba");
 }
 

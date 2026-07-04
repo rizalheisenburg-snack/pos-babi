@@ -342,6 +342,13 @@ html, body {
 .aba-order-id { font-size: 14px; font-weight: 700; color: var(--hint); margin-bottom: 4px; }
 .aba-note { color: var(--hint); font-size: 12px; text-align: center; margin: 12px 0 0; }
 .aba-btn-row { width: 100%; margin-top: 16px; }
+.aba-voucher-info { width: 100%; display: flex; align-items: center; gap: 12px; margin-top: 12px; }
+.aba-voucher-info.hidden { display: none; }
+.aba-voucher-info .price-summary { flex: 1; margin-top: 0; border-top: none; padding-top: 0; }
+.aba-voucher-thumb {
+  width: 56px; height: 56px; object-fit: cover;
+  border-radius: 10px; box-shadow: var(--shadow); flex-shrink: 0;
+}
 
 #screen-aba-proof .success-inner a.btn-primary {
   display: block; box-sizing: border-box;

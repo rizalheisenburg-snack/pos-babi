@@ -37,6 +37,7 @@ CREATE TABLE IF NOT EXISTS orders (
     total          INTEGER GENERATED ALWAYS AS (subtotal - voucher_value) STORED,
 
     note           TEXT,
+    admin_msg_id   INTEGER,                            -- message_id kartu order di chat admin
     created_at     TEXT DEFAULT (datetime('now')),     -- UTC
     updated_at     TEXT DEFAULT (datetime('now'))      -- UTC
 );
@@ -49,5 +50,13 @@ CREATE TABLE IF NOT EXISTS order_items (
     qty        INTEGER NOT NULL,
     unit_price INTEGER NOT NULL,           -- riel, snapshot saat checkout
     line_total INTEGER GENERATED ALWAYS AS (qty * unit_price) STORED,
+    FOREIGN KEY (order_id) REFERENCES orders(id)
+);
+
+CREATE TABLE IF NOT EXISTS payment_proofs (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_id     INTEGER NOT NULL,
+    file_id      TEXT    NOT NULL,                     -- Telegram file_id, ga download fisik
+    submitted_at TEXT DEFAULT (datetime('now')),       -- UTC
     FOREIGN KEY (order_id) REFERENCES orders(id)
 );

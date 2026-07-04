@@ -58,15 +58,19 @@ async def api_checkout(request):
         return _json({"ok": False, "error": "Unauthorized"}, 401)
     try:
         body = await request.json()
+        note = body.get("note", "")
         result = checkout(
             user=user,
             items=body.get("items", []),
             use_voucher=bool(body.get("use_voucher", False)),
-            note=body.get("note", ""),
+            note=note,
         )
         # Kirim notif ke owner kalau order masuk (ok atau PARTIAL)
         if result.get("ok") or result.get("error") == "PARTIAL":
             await _notify_owner_new_order(request, result.get("order_id"))
+        # Order ABA sukses & masih perlu bayar → kirim rincian + instruksi bukti TF ke user
+        if result.get("ok") and not result.get("auto_paid") and note.startswith("[Transfer ABA]"):
+            await _send_aba_receipt_to_user(request, result.get("order_id"))
         return _json(result, 200 if result["ok"] else 400)
     except Exception as e:
         log.exception("checkout error")
@@ -81,19 +85,43 @@ async def _notify_owner_new_order(request: web.Request, order_id: int | None):
         return
     try:
         from owner_console import _order_keyboard, _order_text
-        from state_machine import get_order
+        from state_machine import get_order, set_admin_msg_id
         o = get_order(order_id)
         if not o:
             return
-        from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-        await bot.send_message(
+        msg = await bot.send_message(
             chat_id=OWNER_ID,
             text=f"🔔 *Order baru masuk!*\n\n{_order_text(o)}",
             parse_mode="Markdown",
             reply_markup=_order_keyboard(o["id"], o["status"], o["payment_status"]),
         )
+        set_admin_msg_id(order_id, msg.message_id)
     except Exception:
         log.exception("gagal kirim notif owner")
+
+
+async def _send_aba_receipt_to_user(request: web.Request, order_id: int | None):
+    if not order_id:
+        return
+    bot = request.app["bot"]
+    if not bot:
+        return
+    try:
+        from owner_console import _order_text
+        from state_machine import get_order
+        o = get_order(order_id)
+        if not o:
+            return
+        await bot.send_message(
+            chat_id=o["user_id"],
+            text=(
+                f"{_order_text(o, for_admin=False)}\n\n"
+                f"📸 Reply pesan ini dengan screenshot bukti transfer ABA."
+            ),
+            parse_mode="Markdown",
+        )
+    except Exception:
+        log.exception("gagal kirim receipt ABA ke user")
 
 
 @routes.post("/api/checkout/confirm-partial")

@@ -15,3 +15,7 @@ def init_db() -> None:
         sql = f.read()
     with get_conn() as conn:
         conn.executescript(sql)
+        cols = [r[1] for r in conn.execute("PRAGMA table_info(orders)").fetchall()]
+        if "admin_msg_id" not in cols:
+            conn.execute("ALTER TABLE orders ADD COLUMN admin_msg_id INTEGER")
+        conn.commit()

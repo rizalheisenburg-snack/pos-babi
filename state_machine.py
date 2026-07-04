@@ -135,6 +135,37 @@ def get_pending_orders() -> list[dict]:
     return [dict(r) for r in rows]
 
 
+def get_latest_unpaid_order(user_id: int) -> dict | None:
+    """Order UNPAID terbaru milik user, buat matching bukti transfer."""
+    with get_conn() as conn:
+        row = conn.execute(
+            """SELECT * FROM orders
+               WHERE user_id=? AND payment_status='UNPAID'
+                 AND status NOT IN ('REJECTED', 'CANCELLED')
+               ORDER BY created_at DESC LIMIT 1""",
+            (user_id,),
+        ).fetchone()
+    return dict(row) if row else None
+
+
+def set_admin_msg_id(order_id: int, message_id: int) -> None:
+    """Simpen message_id kartu order di chat admin, buat reply bukti transfer."""
+    with get_conn() as conn:
+        conn.execute(
+            "UPDATE orders SET admin_msg_id=? WHERE id=?", (message_id, order_id)
+        )
+        conn.commit()
+
+
+def add_payment_proof(order_id: int, file_id: str) -> None:
+    with get_conn() as conn:
+        conn.execute(
+            "INSERT INTO payment_proofs (order_id, file_id) VALUES (?, ?)",
+            (order_id, file_id),
+        )
+        conn.commit()
+
+
 # ── Transisi ──────────────────────────────────────────────────────────────────
 
 def transition(order_id: int, new_status: str, actor: str = "owner") -> dict:

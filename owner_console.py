@@ -11,6 +11,8 @@ from telegram.ext import (
     CallbackQueryHandler,
     CommandHandler,
     ContextTypes,
+    MessageHandler,
+    filters,
 )
 
 from config import BOT_TOKEN, OWNER_ID, WEBAPP_URL
@@ -18,6 +20,8 @@ from db import get_conn
 from state_machine import (
     STATUS_LABEL,
     TRANSITIONS,
+    add_payment_proof,
+    get_latest_unpaid_order,
     get_omzet,
     get_order,
     get_pending_orders,
@@ -34,7 +38,7 @@ def riel(n: int) -> str:
     return f"{n:,}៛"
 
 
-def _order_text(o: dict) -> str:
+def _order_text(o: dict, *, for_admin: bool = True) -> str:
     items_text = "\n".join(
         f"  • {i['item_name']} x{i['qty']}  {riel(i['unit_price'] * i['qty'])}"
         for i in o.get("items", [])
@@ -42,12 +46,13 @@ def _order_text(o: dict) -> str:
     voucher_line = f"  Voucher : -{riel(o['voucher_value'])}\n" if o.get("voucher_used") else ""
     pay_status = "✅ LUNAS" if o["payment_status"] == "PAID" else "❌ BELUM BAYAR"
     paid_info = f" ({o['paid_currency']})" if o.get("paid_currency") else ""
+    note_line = f"📝 Note    : {o.get('note') or '-'}\n\n" if for_admin else "\n"
     return (
         f"🧾 *Order #{o['id']}*\n"
         f"👤 {o.get('full_name') or o.get('username') or o['user_id']}\n"
         f"📋 Status  : {STATUS_LABEL.get(o['status'], o['status'])}\n"
         f"💳 Bayar   : {pay_status}{paid_info}\n"
-        f"📝 Note    : {o.get('note') or '-'}\n\n"
+        f"{note_line}"
         f"{items_text}\n\n"
         f"  Subtotal : {riel(o['subtotal'])}\n"
         f"{voucher_line}"
@@ -244,6 +249,36 @@ async def cmd_push(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(f"Gagal kirim: {e}")
 
 
+# ── Bukti transfer ────────────────────────────────────────────────────────────
+
+async def handle_payment_proof(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    if user.id == OWNER_ID:
+        return
+
+    order = get_latest_unpaid_order(user.id)
+    if not order:
+        await update.message.reply_text("Tidak ada order aktif.")
+        return
+
+    photo_file_id = update.message.photo[-1].file_id
+    add_payment_proof(order["id"], photo_file_id)
+
+    try:
+        await ctx.bot.send_photo(
+            chat_id=OWNER_ID,
+            photo=photo_file_id,
+            caption=f"📸 Bukti transfer — Order #{order['id']}",
+            reply_to_message_id=order.get("admin_msg_id"),
+        )
+    except Exception:
+        log.exception(f"gagal forward bukti transfer order #{order['id']}")
+
+    await update.message.reply_text(
+        "Bukti transfer diterima, terima kasih! Ditunggu konfirmasi dari admin ya 🙏"
+    )
+
+
 # ── Callback handler ──────────────────────────────────────────────────────────
 
 async def callback_handler(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
@@ -330,5 +365,6 @@ def build_application() -> Application:
     app.add_handler(CommandHandler("stok",    cmd_stok))
     app.add_handler(CommandHandler("menu",    cmd_menu))
     app.add_handler(CommandHandler("push",    cmd_push))
+    app.add_handler(MessageHandler(filters.PHOTO, handle_payment_proof))
     app.add_handler(CallbackQueryHandler(callback_handler))
     return app

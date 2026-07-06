@@ -6,7 +6,12 @@ MENU = [
 # ── MENU BABI ─────────────────────────────────────────────
 ("Ricebowl Babi / Samcan Sambal Matah", "", 12000, "Babi & Samcan", "🐷", None),
 ("Ricebowl Babi / Samcan Sambal Ijo", "", 12000, "Babi & Samcan", "🐷", None),
-...
+("Ricebowl Babi / Samcan Sambal Bawang", "", 12000, "Babi & Samcan", "🐷", None),
+("Ricebowl Babi / Samcan Sambal Tempong", "", 12000, "Babi & Samcan", "🐷", None),
+("Ricebowl Babi Rica", "", 12000, "Babi & Samcan", "🐷", None),
+("Ricebowl Babi Asam Manis", "", 12000, "Babi & Samcan", "🐷", None),
+("Ricebowl Babi Lada Hitam", "", 12000, "Babi & Samcan", "🐷", None),
+("Ricebowl Babi Lada Garam", "", 12000, "Babi & Samcan", "🐷", None),
 ("Ricebowl Samcan Kecap", "", 12000, "Babi & Samcan", "🐷", None),
 
 # ── NASI GORENG ───────────────────────────────────────────
@@ -99,10 +104,28 @@ MENU = [
 ("Nasi Putih", "", 2000, "Nasi", "🍚", None),
 
 # ── OBAT-OBATAN ───────────────────────────────────────────
-# (tidak berubah)
-("Tolak Angin", "", 3000, "Obat-Obatan", "🌿", None),
-...
-("Diapet", "", 6000, "Obat-Obatan", "💊", None),
+("Tolak Angin",         "", 3_000,  "Obat-Obatan", "🌿", None),
+("Cataflam",            "", 5_000,  "Obat-Obatan", "💊", None),
+("Cetirizine",          "", 5_000,  "Obat-Obatan", "💊", None),
+("Nin Jiom Pei Pa Koa", "", 30_000, "Obat-Obatan", "🍯", None),
+("Panadol Biru",        "", 10_000, "Obat-Obatan", "💊", None),
+("Panadol Merah",       "", 10_000, "Obat-Obatan", "💊", None),
+("Degirol",             "", 15_000, "Obat-Obatan", "💊", None),
+("Komix",               "", 2_000,  "Obat-Obatan", "💊", None),
+("XonCe",               "", 2_000,  "Obat-Obatan", "💊", None),
+("Vitacimin",           "", 2_000,  "Obat-Obatan", "💊", None),
+("Freshcare Citrus",    "", 7_000,  "Obat-Obatan", "💊", None),
+("Freshcare Hot",       "", 7_000,  "Obat-Obatan", "💊", None),
+("Minyak Kayu Putih",   "", 7_000,  "Obat-Obatan", "🌿", None),
+("Promag",              "", 12_000, "Obat-Obatan", "💊", None),
+("Mylanta",             "", 12_000, "Obat-Obatan", "💊", None),
+("Sanmol",              "", 5_000,  "Obat-Obatan", "💊", None),
+("Bodrex",              "", 4_000,  "Obat-Obatan", "💊", None),
+("Mixagrip Flu",        "", 4_000,  "Obat-Obatan", "💊", None),
+("Ultraflu",            "", 4_000,  "Obat-Obatan", "💊", None),
+("Paramex",             "", 4_000,  "Obat-Obatan", "💊", None),
+("Decolgen",            "", 4_000,  "Obat-Obatan", "💊", None),
+("Diapet",              "", 6_000,  "Obat-Obatan", "💊", None),
 ]
 
 

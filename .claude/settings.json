@@ -7,7 +7,12 @@
       "Bash(git commit *)",
       "Bash(git push *)",
       "Bash(python -m pytest test_checkout.py -v)",
-      "Bash(python -m pytest -q)"
+      "Bash(python -m pytest -q)",
+      "Bash(ls .claude)",
+      "Bash(find . -maxdepth 1 -iname \"*.sh\" -o -maxdepth 1 -iname \"Makefile\" -o -maxdepth 1 -iname \"deploy*\")",
+      "Bash(sed 's/=.*/=***/' .env)",
+      "Bash(python -c \"import ast; ast.parse\\(open\\('inject_menu.py', encoding='utf-8'\\).read\\(\\)\\)\")",
+      "Bash(python -c ' *)"
     ]
   }
 }

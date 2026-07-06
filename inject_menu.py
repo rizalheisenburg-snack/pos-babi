@@ -126,6 +126,26 @@ MENU = [
 ("Paramex",             "", 4_000,  "Obat-Obatan", "💊", None),
 ("Decolgen",            "", 4_000,  "Obat-Obatan", "💊", None),
 ("Diapet",              "", 6_000,  "Obat-Obatan", "💊", None),
+
+# ── ROKOK INDO ────────────────────────────────────────────
+("Esse Double Change", "", 22_000, "Rokok Indo", "🚬", None),
+("Esse Double Pop",    "", 22_000, "Rokok Indo", "🚬", None),
+("Esse Change Juice",  "", 22_000, "Rokok Indo", "🚬", None),
+("GG Filter",          "", 14_000, "Rokok Indo", "🚬", None),
+("Surya 16",           "", 17_000, "Rokok Indo", "🚬", None),
+
+# ── ROKOK LOKAL ───────────────────────────────────────────
+("Marlboro Gold",    "", 8_000, "Rokok Lokal", "🚬", None),
+("Marlboro Merah",   "", 8_000, "Rokok Lokal", "🚬", None),
+("Esse Change Biru", "", 8_000, "Rokok Lokal", "🚬", None),
+("Korek Api",        "", 2_000, "Rokok Lokal", "🔥", None),
+
+# ── MINUMAN ───────────────────────────────────────────────
+("Vital 500ml",        "", 2_000, "Minuman", "💧", None),
+("Vital 1.5L",         "", 4_000, "Minuman", "💧", None),
+("Pocari Sweat 500ml", "", 6_000, "Minuman", "🥤", None),
+("Liang Teh Kaleng",   "", 4_000, "Minuman", "🥤", None),
+("Coca Cola",          "", 4_000, "Minuman", "🥤", None),
 ]
 
 

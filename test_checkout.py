@@ -248,7 +248,7 @@ async def test_mirror_full_cash_no_voucher_sends_no_photo(fake_user, seeded_menu
 
 
 @pytest.mark.asyncio
-async def test_mirror_auto_paid_sends_short_confirmation_only(fake_user, seeded_menu, fake_qr_images):
+async def test_mirror_auto_paid_with_voucher_sends_voucher_qr(fake_user, seeded_menu, fake_qr_images):
     result = checkout(
         user=fake_user, items=[{"item_id": 1, "qty": 2}],
         use_voucher=True, note="[KD] gratis", payment_method="CASH",
@@ -260,4 +260,5 @@ async def test_mirror_auto_paid_sends_short_confirmation_only(fake_user, seeded_
 
     assert len(bot.messages) == 1
     assert "Total 0" in bot.messages[0]
-    assert bot.photos == []
+    assert "bukti scan voucher" in bot.messages[0]
+    assert bot.photos == [b"VOUCHER_QR_BYTES"]

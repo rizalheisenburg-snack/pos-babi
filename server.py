@@ -116,12 +116,28 @@ async def _send_order_mirror_to_user(request: web.Request, order_id: int | None)
         if not o:
             return
 
+        async def _send_photo(path):
+            if not path:
+                return
+            try:
+                with open(path, "rb") as f:
+                    await bot.send_photo(chat_id=o["user_id"], photo=f)
+            except FileNotFoundError:
+                log.warning("QR image not found: %s", path)
+            except Exception:
+                log.exception("gagal kirim foto ke user")
+
         if o["total"] == 0:
+            lines = [f"✅ Order #{o['id']} berhasil. Total 0៛, pesanan Anda telah diterima."]
+            if o.get("voucher_used"):
+                lines.append("📸 Reply pesan ini dengan screenshot bukti scan voucher.")
             await bot.send_message(
                 chat_id=o["user_id"],
-                text=f"✅ Order #{o['id']} berhasil. Total 0៛, pesanan Anda telah diterima.",
+                text="\n\n".join(lines),
                 parse_mode="Markdown",
             )
+            if o.get("voucher_used"):
+                await _send_photo(VOUCHER_QR_IMAGE_PATH)
             return
 
         lines = [
@@ -141,17 +157,6 @@ async def _send_order_mirror_to_user(request: web.Request, order_id: int | None)
             text=text,
             parse_mode="Markdown",
         )
-
-        async def _send_photo(path):
-            if not path:
-                return
-            try:
-                with open(path, "rb") as f:
-                    await bot.send_photo(chat_id=o["user_id"], photo=f)
-            except FileNotFoundError:
-                log.warning("QR image not found: %s", path)
-            except Exception:
-                log.exception("gagal kirim foto ke user")
 
         if o.get("payment_method") == "ABA":
             await _send_photo(ABA_QR_IMAGE_PATH)

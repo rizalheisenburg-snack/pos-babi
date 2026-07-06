@@ -18,4 +18,12 @@ def init_db() -> None:
         cols = [r[1] for r in conn.execute("PRAGMA table_info(orders)").fetchall()]
         if "admin_msg_id" not in cols:
             conn.execute("ALTER TABLE orders ADD COLUMN admin_msg_id INTEGER")
+        if "payment_method" not in cols:
+            conn.execute("ALTER TABLE orders ADD COLUMN payment_method TEXT")
+        conn.execute(
+            "UPDATE orders SET payment_method='ABA' WHERE note LIKE '[Transfer ABA]%'"
+        )
+        conn.execute(
+            "UPDATE orders SET payment_method='CASH' WHERE payment_method IS NULL OR payment_method = ''"
+        )
         conn.commit()

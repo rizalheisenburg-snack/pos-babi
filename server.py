@@ -64,13 +64,14 @@ async def api_checkout(request):
             items=body.get("items", []),
             use_voucher=bool(body.get("use_voucher", False)),
             note=note,
+            payment_method=body.get("payment_method", "CASH"),
         )
         # Kirim notif ke owner kalau order masuk (ok atau PARTIAL)
         if result.get("ok") or result.get("error") == "PARTIAL":
             await _notify_owner_new_order(request, result.get("order_id"))
-        # Order ABA sukses & masih perlu bayar → kirim rincian + instruksi bukti TF ke user
-        if result.get("ok") and not result.get("auto_paid") and note.startswith("[Transfer ABA]"):
-            await _send_aba_receipt_to_user(request, result.get("order_id"))
+        # Kirim mirror ke pelanggan untuk semua order sukses yang bukan auto-paid
+        if result.get("ok") and not result.get("auto_paid"):
+            await _send_order_mirror_to_user(request, result.get("order_id"))
         return _json(result, 200 if result["ok"] else 400)
     except Exception as e:
         log.exception("checkout error")
@@ -100,7 +101,7 @@ async def _notify_owner_new_order(request: web.Request, order_id: int | None):
         log.exception("gagal kirim notif owner")
 
 
-async def _send_aba_receipt_to_user(request: web.Request, order_id: int | None):
+async def _send_order_mirror_to_user(request: web.Request, order_id: int | None):
     if not order_id:
         return
     bot = request.app["bot"]
@@ -109,19 +110,50 @@ async def _send_aba_receipt_to_user(request: web.Request, order_id: int | None):
     try:
         from owner_console import _order_text
         from state_machine import get_order
+        from config import ABA_QR_IMAGE_PATH, VOUCHER_QR_IMAGE_PATH
+
         o = get_order(order_id)
         if not o:
             return
+
+        if o["total"] == 0:
+            await bot.send_message(
+                chat_id=o["user_id"],
+                text=f"✅ Order #{o['id']} berhasil. Total 0៛, pesanan Anda telah diterima.",
+                parse_mode="Markdown",
+            )
+            return
+
+        lines = [
+            _order_text(o, for_admin=False),
+        ]
+        if o.get("payment_method") == "ABA":
+            lines.append("📸 Reply pesan ini dengan screenshot bukti transfer ABA.")
+        text = "\n\n".join(lines)
+
         await bot.send_message(
             chat_id=o["user_id"],
-            text=(
-                f"{_order_text(o, for_admin=False)}\n\n"
-                f"📸 Reply pesan ini dengan screenshot bukti transfer ABA."
-            ),
+            text=text,
             parse_mode="Markdown",
         )
+
+        async def _send_photo(path):
+            if not path:
+                return
+            try:
+                with open(path, "rb") as f:
+                    await bot.send_photo(chat_id=o["user_id"], photo=f)
+            except FileNotFoundError:
+                log.warning("QR image not found: %s", path)
+            except Exception:
+                log.exception("gagal kirim foto ke user")
+
+        if o.get("payment_method") == "ABA":
+            await _send_photo(ABA_QR_IMAGE_PATH)
+        if o.get("voucher_used"):
+            await _send_photo(VOUCHER_QR_IMAGE_PATH)
     except Exception:
-        log.exception("gagal kirim receipt ABA ke user")
+        log.exception("gagal kirim mirror order ke user")
 
 
 @routes.post("/api/checkout/confirm-partial")
@@ -131,6 +163,8 @@ async def api_confirm_partial(request):
         return _json({"ok": False, "error": "Unauthorized"}, 401)
     body = await request.json()
     result = confirm_partial(int(body.get("order_id", 0)), user["id"])
+    if result.get("ok"):
+        await _send_order_mirror_to_user(request, result.get("order_id"))
     return _json(result, 200 if result["ok"] else 400)
 
 

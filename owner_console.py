@@ -43,21 +43,21 @@ def _order_text(o: dict, *, for_admin: bool = True) -> str:
         f"  • {i['item_name']} x{i['qty']}  {riel(i['unit_price'] * i['qty'])}"
         for i in o.get("items", [])
     )
-    voucher_line = f"  Voucher : -{riel(o['voucher_value'])}\n" if o.get("voucher_used") else ""
     pay_status = "✅ LUNAS" if o["payment_status"] == "PAID" else "❌ BELUM BAYAR"
     paid_info = f" ({o['paid_currency']})" if o.get("paid_currency") else ""
-    note_line = f"📝 Note    : {o.get('note') or '-'}\n\n" if for_admin else "\n"
+    note_line = f"📝 Note    : {o.get('note') or '-'}\n\n"
+    payment_method_line = ""
+    if for_admin:
+        payment_method_line = f"💳 Metode  : {o.get('payment_method') or 'CASH'}\n"
     return (
         f"🧾 *Order #{o['id']}*\n"
         f"👤 {o.get('full_name') or o.get('username') or o['user_id']}\n"
         f"📋 Status  : {STATUS_LABEL.get(o['status'], o['status'])}\n"
         f"💳 Bayar   : {pay_status}{paid_info}\n"
+        f"{payment_method_line}"
         f"{note_line}"
         f"{items_text}\n\n"
-        f"  Subtotal : {riel(o['subtotal'])}\n"
-        f"{voucher_line}"
-        f"  *Total   : {riel(o['total'])}*\n"
-        f"  Waktu    : {o['created_at']}"
+        f"  *Total   : {riel(o['total'])}*"
     )
 
 

@@ -40,6 +40,7 @@ def checkout(
     items: list[dict],
     use_voucher: bool,
     note: str,
+    payment_method: str = "CASH",
 ) -> dict:
     """
     items: [{"item_id": int, "qty": int}, ...]
@@ -106,10 +107,19 @@ def checkout(
     with get_conn() as conn:
         cur = conn.execute(
             """INSERT INTO orders
-               (user_id, username, full_name, status, subtotal, voucher_used, voucher_value, note)
-               VALUES (?,?,?,?,?,?,?,?)""",
-            (user_id, username, full_name, initial_status,
-             subtotal, 1 if use_voucher else 0, voucher_value, note),
+               (user_id, username, full_name, status, subtotal, voucher_used, voucher_value, note, payment_method)
+               VALUES (?,?,?,?,?,?,?,?,?)""",
+            (
+                user_id,
+                username,
+                full_name,
+                initial_status,
+                subtotal,
+                1 if use_voucher else 0,
+                voucher_value,
+                note,
+                payment_method,
+            ),
         )
         order_id = cur.lastrowid
         conn.executemany(

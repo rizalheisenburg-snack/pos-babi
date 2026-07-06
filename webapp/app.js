@@ -27,73 +27,136 @@ function show(id) {
 }
 
 /* ── Menu screen ──────────────────────────────────────────────── */
-function renderMenu() {
+let currentCategory = null;
+let searchQuery = "";
+
+function categorySlug(name) {
+  return name
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9\-]/g, "");
+}
+
+function menuCardHtml(item) {
+  const qty = cart[item.id]?.qty || 0;
+  return `
+    <div class="menu-card">
+      <div class="menu-info">
+        <div class="menu-name">${item.name}</div>
+        ${item.description ? `<div class="menu-desc">${item.description}</div>` : ""}
+        <div class="menu-price">${riel(item.price)}</div>
+      </div>
+      <div class="qty-control">
+        <button class="qty-btn minus" data-id="${item.id}">−</button>
+        <span class="qty-num" id="qty-${item.id}">${qty}</span>
+        <button class="qty-btn plus" data-id="${item.id}">+</button>
+      </div>
+    </div>`;
+}
+
+// Rebangun kontrol (search + tombol back) cuma kalau state-nya beneran berubah,
+// biar input search nggak kehilangan fokus tiap kali user ngetik satu huruf.
+function renderControls() {
   const tabs = document.getElementById("category-tabs");
+  const showBack = !!currentCategory;
+  if (document.getElementById("menu-search") && tabs.dataset.hasBack === String(showBack)) {
+    return;
+  }
+  tabs.dataset.hasBack = String(showBack);
+  tabs.innerHTML = `
+    <div class="menu-controls">
+      <input id="menu-search" class="menu-search" type="search" placeholder="Cari menu..." value="${searchQuery}" autocomplete="off" />
+      ${showBack ? `<button id="btn-back-cats" class="btn-secondary">Semua Kategori</button>` : ""}
+    </div>
+  `;
+  document.getElementById("menu-search").addEventListener("input", e => {
+    searchQuery = e.target.value;
+    renderList();
+  });
+  document.getElementById("btn-back-cats")?.addEventListener("click", () => {
+    currentCategory = null;
+    searchQuery = "";
+    renderMenu();
+  });
+}
+
+function renderList() {
   const list = document.getElementById("menu-list");
-  const cats = Object.keys(menu);
-  if (!cats.length) {
-    list.innerHTML = "<p class='empty-hint'>Menu kosong</p>";
+  const q = searchQuery.trim().toLowerCase();
+
+  if (q) {
+    const results = Object.values(menu).flat().filter(item =>
+      item.name.toLowerCase().includes(q)
+    );
+    list.innerHTML = results.length
+      ? results.map(menuCardHtml).join("")
+      : `<p class='empty-hint'>Tidak ada hasil untuk "${searchQuery}"</p>`;
     return;
   }
 
-  tabs.innerHTML = cats.map((c, i) =>
-    `<button class="cat-tab${i === 0 ? " active" : ""}" data-cat="${c}">${c}</button>`
-  ).join("");
-
-  function renderCat(activeCat) {
-    list.innerHTML = "";
-    tabs.querySelectorAll(".cat-tab").forEach(t =>
-      t.classList.toggle("active", t.dataset.cat === activeCat)
-    );
-    (menu[activeCat] || []).forEach(item => {
-      const qty = cart[item.id]?.qty || 0;
-      const card = document.createElement("div");
-      card.className = "menu-card";
-      const thumb = item.image_url
-        ? `<img class="menu-thumb" src="${item.image_url}" alt="" loading="lazy" onerror="this.style.display='none'">`
-        : `<div class="menu-emoji">${item.emoji || "🍽️"}</div>`;
-      card.innerHTML = `
-        ${thumb}
-        <div class="menu-info">
-          <div class="menu-name">${item.name}</div>
-          ${item.description ? `<div class="menu-desc">${item.description}</div>` : ""}
-          <div class="menu-price">${riel(item.price)}</div>
-        </div>
-        <div class="qty-control">
-          <button class="qty-btn minus" data-id="${item.id}">−</button>
-          <span class="qty-num" id="qty-${item.id}">${qty}</span>
-          <button class="qty-btn plus" data-id="${item.id}">+</button>
-        </div>`;
-      list.appendChild(card);
-    });
+  if (currentCategory) {
+    list.innerHTML = (menu[currentCategory] || []).map(menuCardHtml).join("");
+    return;
   }
 
-  renderCat(cats[0]);
-
-  tabs.addEventListener("click", e => {
-    const btn = e.target.closest(".cat-tab");
-    if (btn) renderCat(btn.dataset.cat);
-  });
-
-  list.addEventListener("click", e => {
-    const plus = e.target.closest(".qty-btn.plus");
-    const minus = e.target.closest(".qty-btn.minus");
-    if (!plus && !minus) return;
-    const id = parseInt((plus || minus).dataset.id);
-    const item = Object.values(menu).flat().find(i => i.id === id);
-    if (!item) return;
-    if (plus) {
-      cart[id] = cart[id] || { item, qty: 0 };
-      cart[id].qty++;
-    } else {
-      if (!cart[id]?.qty) return;
-      cart[id].qty--;
-      if (cart[id].qty === 0) delete cart[id];
-    }
-    document.getElementById(`qty-${id}`).textContent = cart[id]?.qty || 0;
-    updateCartFab();
-  });
+  list.innerHTML = Object.keys(menu).map(cat => {
+    const slug = categorySlug(cat);
+    const fallbackEmoji = menu[cat][0]?.emoji || "🍽️";
+    return `
+      <button class="category-card" data-cat="${cat}">
+        <div class="category-image">
+          <img src="cat/${slug}.jpg" alt="${cat}" loading="lazy"
+               onload="this.nextElementSibling.style.display='none'"
+               onerror="this.style.display='none'" />
+          <div class="category-fallback">${fallbackEmoji}</div>
+        </div>
+        <div class="category-name">${cat}</div>
+      </button>`;
+  }).join("");
 }
+
+function renderMenu() {
+  const tabs = document.getElementById("category-tabs");
+  const list = document.getElementById("menu-list");
+  if (!Object.keys(menu).length) {
+    tabs.innerHTML = "";
+    list.innerHTML = "<p class='empty-hint'>Menu kosong</p>";
+    return;
+  }
+  renderControls();
+  renderList();
+}
+
+const menuList = document.getElementById("menu-list");
+const categoryTabs = document.getElementById("category-tabs");
+
+categoryTabs.addEventListener("click", e => {
+  const card = e.target.closest(".category-card");
+  if (card) {
+    currentCategory = card.dataset.cat;
+    searchQuery = "";
+    renderMenu();
+  }
+});
+
+menuList.addEventListener("click", e => {
+  const plus = e.target.closest(".qty-btn.plus");
+  const minus = e.target.closest(".qty-btn.minus");
+  if (!plus && !minus) return;
+  const id = parseInt((plus || minus).dataset.id);
+  const item = Object.values(menu).flat().find(i => i.id === id);
+  if (!item) return;
+  if (plus) {
+    cart[id] = cart[id] || { item, qty: 0 };
+    cart[id].qty++;
+  } else {
+    if (!cart[id]?.qty) return;
+    cart[id].qty--;
+    if (cart[id].qty === 0) delete cart[id];
+  }
+  document.getElementById(`qty-${id}`).textContent = cart[id]?.qty || 0;
+  updateCartFab();
+});
 
 function cartSubtotal() {
   return Object.values(cart).reduce((s, { item, qty }) => s + item.price * qty, 0);
@@ -156,10 +219,7 @@ function updatePriceSummary() {
   const disc = useVoucher ? 10_000 : 0;
   const total = Math.max(0, sub - disc);
 
-  document.getElementById("sum-subtotal").textContent = riel(sub);
-  document.getElementById("sum-discount").textContent = `-${riel(disc)}`;
   document.getElementById("sum-total").textContent = riel(total);
-  document.getElementById("discount-row").classList.toggle("hidden", !useVoucher);
 }
 
 /* ── Voucher toggle ───────────────────────────────────────────── */
@@ -235,7 +295,7 @@ async function doCheckout(payMethod, onSuccess = showSuccess) {
 
   const result = await api("/api/checkout", {
     method: "POST",
-    body: JSON.stringify({ items, use_voucher: useVoucher, note }),
+    body: JSON.stringify({ items, use_voucher: useVoucher, note, payment_method: payMethod }),
   });
 
   if (result.ok) {
@@ -263,52 +323,11 @@ document.getElementById("btn-pay-aba").addEventListener("click", async () => {
   const btn = document.getElementById("btn-pay-aba");
   btn.disabled = true; btn.textContent = "Memproses...";
   stopPolling();
-  document.getElementById("btn-aba-back").dataset.target = "screen-cart";
-  await doCheckout("ABA", showAbaScreen);
+  await doCheckout("ABA", showSuccess);
   btn.disabled = false; btn.textContent = "🏦 ABA";
 });
 
-function showAbaScreen(result) {
-  const total = result.total;
-  const usd = total / 4000;
-  const usdStr = usd % 1 === 0 ? `$${usd}` : `$${usd.toFixed(usd < 1 ? 2 : 1)}`;
-  const screen = document.getElementById("screen-aba");
-  screen.dataset.orderId = result.order_id;
-  screen.dataset.total = total;
-  screen.dataset.voucherUsed = result.voucher_value > 0 ? "1" : "0";
-  document.getElementById("aba-order-id").textContent = "Order #" + result.order_id;
-  document.getElementById("aba-total").textContent = riel(total);
-  document.getElementById("aba-total-usd").textContent = `≈ ${usdStr}`;
-
-  const voucherInfo = document.getElementById("aba-voucher-info");
-  if (result.voucher_value > 0) {
-    document.getElementById("aba-subtotal").textContent = riel(result.subtotal);
-    document.getElementById("aba-voucher-discount").textContent = `-${riel(result.voucher_value)}`;
-    voucherInfo.classList.remove("hidden");
-  } else {
-    voucherInfo.classList.add("hidden");
-  }
-
-  show("screen-aba");
-}
-
-document.getElementById("btn-aba-sudah").addEventListener("click", () => {
-  const voucherUsed = document.getElementById("screen-aba").dataset.voucherUsed === "1";
-  document.getElementById("aba-proof-text").textContent = voucherUsed
-    ? "Cek chat kamu dengan bot ini — ada pesan rincian order & voucher dari bot. Reply pesan itu dengan screenshot bukti transfer ABA kamu ya 🙏"
-    : "Cek chat kamu dengan bot ini — ada pesan rincian order dari bot. Reply pesan itu dengan screenshot bukti transfer ABA kamu ya 🙏";
-  show("screen-aba-proof");
-});
-
-document.getElementById("btn-aba-nanti").addEventListener("click", () => {
-  const screen = document.getElementById("screen-aba");
-  showSuccess({ order_id: screen.dataset.orderId, total: Number(screen.dataset.total) });
-});
-
-document.getElementById("btn-aba-proof-lanjut").addEventListener("click", () => {
-  const screen = document.getElementById("screen-aba");
-  showSuccess({ order_id: screen.dataset.orderId, total: Number(screen.dataset.total) });
-});
+// ABA screen flow is no longer active; keep markup commented out in HTML.
 
 function clearCart() {
   Object.keys(cart).forEach(k => delete cart[k]);
@@ -438,11 +457,6 @@ async function _fetchOrderDetail(id) {
     ? `<div class="detail-row green"><span>Pembayaran</span><span>Lunas (${o.paid_currency || ""})</span></div>`
     : `<div class="detail-row" style="color:var(--red)"><span>Pembayaran</span><span>Belum Bayar</span></div>`;
 
-  const isAba = (o.note || "").includes("[Transfer ABA]");
-  const transferBtnHtml = isAba && o.payment_status !== "PAID"
-    ? `<button id="btn-detail-aba-transfer" class="btn-primary">Transfer Sekarang</button>`
-    : "";
-
   body.innerHTML = `
     <div class="detail-status-big">${o.status_label}</div>
     <div class="detail-items">
@@ -450,22 +464,10 @@ async function _fetchOrderDetail(id) {
       ${itemsHtml}
     </div>
     <div class="detail-summary">
-      <div class="detail-row"><span>Subtotal</span><span>${riel(o.subtotal)}</span></div>
-      ${discHtml}
       <div class="detail-row detail-total"><span>Total</span><span>${riel(o.total)}</span></div>
       ${payHtml}
       ${o.note ? `<div class="detail-note">📝 ${o.note}</div>` : ""}
-    </div>
-    ${transferBtnHtml}`;
-
-  const transferBtn = document.getElementById("btn-detail-aba-transfer");
-  if (transferBtn) {
-    transferBtn.addEventListener("click", () => {
-      stopPolling();
-      document.getElementById("btn-aba-back").dataset.target = "screen-order-detail";
-      showAbaScreen({ order_id: o.id, total: o.total });
-    });
-  }
+    </div>`;
 }
 
 /* ── Polling ──────────────────────────────────────────────────── */

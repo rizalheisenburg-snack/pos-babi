@@ -37,6 +37,16 @@ function categorySlug(name) {
     .replace(/[^a-z0-9\-]/g, "");
 }
 
+// Warna tint solid per kategori, deterministik dari nama (biar konsisten tiap render).
+function categoryColor(name) {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const hue = Math.abs(hash) % 360;
+  return `hsl(${hue}, 42%, 24%)`;
+}
+
 function menuCardHtml(item) {
   const qty = cart[item.id]?.qty || 0;
   return `
@@ -65,8 +75,11 @@ function renderControls() {
   tabs.dataset.hasBack = String(showBack);
   tabs.innerHTML = `
     <div class="menu-controls">
-      <input id="menu-search" class="menu-search" type="search" placeholder="Cari menu..." value="${searchQuery}" autocomplete="off" />
-      ${showBack ? `<button id="btn-back-cats" class="btn-secondary">Semua Kategori</button>` : ""}
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input id="menu-search" class="menu-search" type="search" placeholder="Cari menu..." value="${searchQuery}" autocomplete="off" />
+      </div>
+      ${showBack ? `<button id="btn-back-cats" class="btn-cats-back">Semua Kategori</button>` : ""}
     </div>
   `;
   document.getElementById("menu-search").addEventListener("input", e => {
@@ -104,7 +117,7 @@ function renderList() {
     const fallbackEmoji = menu[cat][0]?.emoji || "🍽️";
     return `
       <button class="category-card" data-cat="${cat}">
-        <div class="category-image">
+        <div class="category-visual" style="background:${categoryColor(cat)}">
           <img src="cat/${slug}.jpg" alt="${cat}" loading="lazy"
                onload="this.nextElementSibling.style.display='none'"
                onerror="this.style.display='none'" />

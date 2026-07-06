@@ -141,18 +141,15 @@ function renderMenu() {
 }
 
 const menuList = document.getElementById("menu-list");
-const categoryTabs = document.getElementById("category-tabs");
 
-categoryTabs.addEventListener("click", e => {
+menuList.addEventListener("click", e => {
   const card = e.target.closest(".category-card");
   if (card) {
     currentCategory = card.dataset.cat;
     searchQuery = "";
     renderMenu();
+    return;
   }
-});
-
-menuList.addEventListener("click", e => {
   const plus = e.target.closest(".qty-btn.plus");
   const minus = e.target.closest(".qty-btn.minus");
   if (!plus && !minus) return;

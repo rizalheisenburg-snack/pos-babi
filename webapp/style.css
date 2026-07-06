@@ -428,6 +428,10 @@ html, body {
 .btn-pay-method.aba {
   background: #1a56db; color: #fff;
 }
+.btn-pay-method.voucher {
+  background: var(--accent); color: #fff;
+}
+.btn-pay-method.hidden { display: none; }
 
 /* ── ABA screen ───────────────────────────────────────────────── */
 .aba-inner {

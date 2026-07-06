@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS orders (
     payment_status TEXT    NOT NULL DEFAULT 'UNPAID',  -- UNPAID | PAID
     paid_currency  TEXT,                               -- 'RIEL' | 'USD' (apa yang masuk laci)
     paid_at        TEXT,                               -- UTC datetime, wajib UTC
-    payment_method TEXT,                               -- 'CASH' | 'ABA'
+    payment_method TEXT,                               -- 'CASH' | 'ABA' | 'VOUCHER'
 
     -- Voucher
     voucher_used   INTEGER DEFAULT 0,      -- 1 = voucher dipakai

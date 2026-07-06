@@ -97,6 +97,14 @@ def checkout(
             }
         voucher_value = voucher_result["voucher_value"]
 
+    # ── VOUCHER cuma valid kalau total hasil hitungan server beneran 0 ─────────
+    # (client ga boleh nentuin gratis sendiri, server yang hitung)
+    if payment_method == "VOUCHER" and (subtotal - voucher_value) != 0:
+        return {
+            "ok": False,
+            "error": "Metode VOUCHER cuma bisa dipakai kalau total order 0. Pilih Cash atau ABA.",
+        }
+
     # ── Ada item habis sebagian → PARTIAL_PENDING ──────────────────────────────
     initial_status = "PARTIAL_PENDING" if unavailable_items else "PENDING"
 

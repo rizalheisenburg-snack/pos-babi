@@ -31,6 +31,12 @@ from state_machine import (
 
 USD_RATE = 4_000  # 1 USD = 4000 riel, statis
 
+PAYMENT_METHOD_LABEL: dict[str, str] = {
+    "CASH": "💵 CASH",
+    "ABA": "🏦 ABA",
+    "VOUCHER": "🎟 VOUCHER",
+}
+
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -48,7 +54,8 @@ def _order_text(o: dict, *, for_admin: bool = True) -> str:
     note_line = f"📝 Note    : {o.get('note') or '-'}\n\n"
     payment_method_line = ""
     if for_admin:
-        payment_method_line = f"💳 Metode  : {o.get('payment_method') or 'CASH'}\n"
+        method = o.get("payment_method") or "CASH"
+        payment_method_line = f"💳 Metode  : {PAYMENT_METHOD_LABEL.get(method, method)}\n"
     return (
         f"🧾 *Order #{o['id']}*\n"
         f"👤 {o.get('full_name') or o.get('username') or o['user_id']}\n"

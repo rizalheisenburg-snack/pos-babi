@@ -127,8 +127,13 @@ async def _send_order_mirror_to_user(request: web.Request, order_id: int | None)
         lines = [
             _order_text(o, for_admin=False),
         ]
+        proof_needed = []
         if o.get("payment_method") == "ABA":
-            lines.append("📸 Reply pesan ini dengan screenshot bukti transfer ABA.")
+            proof_needed.append("bukti transfer ABA")
+        if o.get("voucher_used"):
+            proof_needed.append("bukti scan voucher")
+        if proof_needed:
+            lines.append(f"📸 Reply pesan ini dengan screenshot {' & '.join(proof_needed)}.")
         text = "\n\n".join(lines)
 
         await bot.send_message(

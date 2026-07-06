@@ -91,6 +91,32 @@ def test_checkout_voucher_total(fake_user, seeded_menu, use_voucher, expected_to
     assert result["ok"]
     assert result["total"] == expected_total
 
+def test_checkout_voucher_free_total_is_paid(fake_user, seeded_menu):
+    result = checkout(
+        user=fake_user,
+        items=[{"item_id": 1, "qty": 2}],  # 2 x 5000 = 10000, pas voucher
+        use_voucher=True,
+        note="[KD] gratis voucher",
+        payment_method="VOUCHER",
+    )
+    assert result["ok"]
+    assert result["total"] == 0
+    assert result["auto_paid"] is True
+    order = get_order(result["order_id"])
+    assert order["payment_method"] == "VOUCHER"
+    assert order["payment_status"] == "PAID"
+
+def test_checkout_voucher_rejected_when_total_not_zero(fake_user, seeded_menu):
+    result = checkout(
+        user=fake_user,
+        items=[{"item_id": 2, "qty": 1}],  # 15000, voucher potong 10000, sisa 5000
+        use_voucher=True,
+        note="[KD] test",
+        payment_method="VOUCHER",
+    )
+    assert not result["ok"]
+    assert "VOUCHER" in result["error"]
+
 def test_confirm_partial_succeeds_and_order_pending(fake_user, seeded_menu):
     result = checkout(
         user=fake_user,
@@ -184,6 +210,7 @@ async def test_mirror_aba_with_voucher_sends_both_qr(fake_user, seeded_menu, fak
 
     assert len(bot.messages) == 1
     assert "bukti transfer" in bot.messages[0]
+    assert "bukti scan voucher" in bot.messages[0]
     assert sorted(bot.photos) == sorted([b"ABA_QR_BYTES", b"VOUCHER_QR_BYTES"])
 
 
@@ -200,6 +227,7 @@ async def test_mirror_cash_with_voucher_sends_voucher_qr_only(fake_user, seeded_
 
     assert len(bot.messages) == 1
     assert "bukti transfer" not in bot.messages[0]
+    assert "bukti scan voucher" in bot.messages[0]
     assert bot.photos == [b"VOUCHER_QR_BYTES"]
 
 

@@ -220,8 +220,9 @@ function renderCart() {
 
   updatePriceSummary();
   const empty = !entries.length;
-  document.getElementById("btn-pay-cash").disabled = empty;
-  document.getElementById("btn-pay-aba").disabled  = empty;
+  document.getElementById("btn-pay-cash").disabled    = empty;
+  document.getElementById("btn-pay-aba").disabled     = empty;
+  document.getElementById("btn-pay-voucher").disabled = empty;
 }
 
 function updatePriceSummary() {
@@ -230,6 +231,11 @@ function updatePriceSummary() {
   const total = Math.max(0, sub - disc);
 
   document.getElementById("sum-total").textContent = riel(total);
+
+  const isFreeVoucher = useVoucher && total === 0;
+  document.getElementById("btn-pay-cash").classList.toggle("hidden", isFreeVoucher);
+  document.getElementById("btn-pay-aba").classList.toggle("hidden", isFreeVoucher);
+  document.getElementById("btn-pay-voucher").classList.toggle("hidden", !isFreeVoucher);
 }
 
 /* ── Voucher toggle ───────────────────────────────────────────── */
@@ -335,6 +341,13 @@ document.getElementById("btn-pay-aba").addEventListener("click", async () => {
   stopPolling();
   await doCheckout("ABA", showSuccess);
   btn.disabled = false; btn.textContent = "🏦 ABA";
+});
+
+document.getElementById("btn-pay-voucher").addEventListener("click", async () => {
+  const btn = document.getElementById("btn-pay-voucher");
+  btn.disabled = true; btn.textContent = "Memproses...";
+  await doCheckout("VOUCHER", showSuccess);
+  btn.disabled = false; btn.textContent = "🎟 Selesaikan Order — 0៛";
 });
 
 // ABA screen flow is no longer active; keep markup commented out in HTML.

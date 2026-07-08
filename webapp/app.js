@@ -492,6 +492,11 @@ async function _fetchOrderDetail(id) {
     ? `<div class="detail-row green"><span>Pembayaran</span><span>Lunas (${o.paid_currency || ""})</span></div>`
     : `<div class="detail-row" style="color:var(--red)"><span>Pembayaran</span><span>Belum Bayar</span></div>`;
 
+  const cancelHtml = o.status === "PENDING"
+    ? `<button id="btn-cancel-order" class="btn-cancel">🚫 Batalkan Order</button>
+       <p class="cancel-hint">Bisa dibatalkan selama belum dikonfirmasi warung</p>`
+    : "";
+
   body.innerHTML = `
     <div class="detail-status-big">${o.status_label}</div>
     <div class="detail-items">
@@ -502,7 +507,25 @@ async function _fetchOrderDetail(id) {
       <div class="detail-row detail-total"><span>Total</span><span>${riel(o.total)}</span></div>
       ${payHtml}
       ${o.note ? `<div class="detail-note">📝 ${o.note}</div>` : ""}
-    </div>`;
+    </div>
+    ${cancelHtml}`;
+
+  document.getElementById("btn-cancel-order")?.addEventListener("click", () => {
+    const doCancel = async () => {
+      const r = await api(`/api/orders/${id}/cancel`, { method: "POST" });
+      if (r.ok) {
+        tg?.HapticFeedback?.notificationOccurred("warning");
+        _fetchOrderDetail(id);
+      } else {
+        tg?.showAlert?.(r.error || "Gagal membatalkan order.");
+      }
+    };
+    if (tg?.showConfirm) {
+      tg.showConfirm("Yakin mau batalkan order ini?", ok => { if (ok) doCancel(); });
+    } else if (window.confirm("Yakin mau batalkan order ini?")) {
+      doCancel();
+    }
+  });
 }
 
 /* ── Polling ──────────────────────────────────────────────────── */
@@ -566,6 +589,7 @@ document.querySelectorAll(".back-btn[data-target]").forEach(btn => {
   try {
     const data = await api("/api/menu");
     menu = data.categories || {};
+    document.getElementById("closed-banner")?.classList.toggle("hidden", data.open !== false);
     show("screen-menu");
     renderMenu();
   } catch {

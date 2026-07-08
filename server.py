@@ -10,7 +10,7 @@ from aiohttp import web
 
 from checkout_flow import checkout, confirm_partial, verify_init_data
 from config import OWNER_ID
-from db import get_conn
+from db import get_conn, get_setting
 from state_machine import (
     get_order,
     get_user_orders,
@@ -46,7 +46,10 @@ async def api_menu(request):
     for r in rows:
         d = dict(r)
         by_cat.setdefault(d["category"], []).append(d)
-    return _json({"categories": by_cat})
+    return _json({
+        "categories": by_cat,
+        "open": get_setting("shop_open", "1") == "1",
+    })
 
 
 # ── Checkout ──────────────────────────────────────────────────────────────────
@@ -56,6 +59,11 @@ async def api_checkout(request):
     user = _auth(request)
     if not user:
         return _json({"ok": False, "error": "Unauthorized"}, 401)
+    if get_setting("shop_open", "1") != "1":
+        return _json(
+            {"ok": False, "error": "Warung lagi tutup 🌙 Coba lagi pas jam buka ya."},
+            400,
+        )
     try:
         body = await request.json()
         note = body.get("note", "")
@@ -208,7 +216,23 @@ async def api_cancel_order(request):
     if not user:
         return _json({"ok": False, "error": "Unauthorized"}, 401)
     oid = int(request.match_info["order_id"])
+    o = get_order(oid)
+    if not o:
+        return _json({"ok": False, "error": "Tidak ditemukan"}, 404)
+    if o["user_id"] != user["id"] and user["id"] != OWNER_ID:
+        return _json({"ok": False, "error": "Forbidden"}, 403)
     result = transition(oid, "CANCELLED", actor="customer")
+    if result.get("ok"):
+        bot = request.app["bot"]
+        if bot:
+            try:
+                await bot.send_message(
+                    chat_id=OWNER_ID,
+                    text=f"🚫 Order #{oid} dibatalkan oleh customer.",
+                    reply_to_message_id=o.get("admin_msg_id"),
+                )
+            except Exception:
+                log.exception("gagal notif owner soal cancel")
     return _json(result, 200 if result["ok"] else 400)
 
 

@@ -16,7 +16,7 @@ from telegram.ext import (
 )
 
 from config import BOT_TOKEN, OWNER_ID, WEBAPP_URL
-from db import get_conn
+from db import get_conn, get_setting, set_setting
 from state_machine import (
     STATUS_LABEL,
     TRANSITIONS,
@@ -35,6 +35,15 @@ PAYMENT_METHOD_LABEL: dict[str, str] = {
     "CASH": "💵 CASH",
     "ABA": "🏦 ABA",
     "VOUCHER": "🎟 VOUCHER",
+}
+
+# Pesan notif ke customer per status (dipakai pas owner pencet tombol)
+CUSTOMER_STATUS_MSG: dict[str, str] = {
+    "CONFIRMED": "✅ *Order #{id} diterima!*\nPesananmu masuk antrian dapur.",
+    "PREPARING": "👨‍🍳 *Order #{id} lagi dimasak.*\nSebentar lagi jadi!",
+    "DONE":      "🎉 *Order #{id} selesai!*\nPesananmu siap / lagi diantar ke tujuan.",
+    "REJECTED":  "❌ *Order #{id} ditolak.*\nMaaf ya, hubungi admin untuk info lebih lanjut.",
+    "CANCELLED": "🚫 *Order #{id} dibatalkan.*",
 }
 
 
@@ -101,16 +110,37 @@ async def _is_owner(update: Update) -> bool:
 async def cmd_start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     if not await _is_owner(update):
         return
+    shop_status = "🔓 BUKA" if get_setting("shop_open", "1") == "1" else "🔒 TUTUP"
     await update.message.reply_text(
         "☕ *Jakarta Cafe — Owner Panel*\n\n"
+        f"Status warung: *{shop_status}*\n\n"
         "/pending — order masuk\n"
         "/order \\<id\\> — detail 1 order\n"
         "/omzet — rekap bulan ini\n"
         "/omzet 6 2026 — rekap bulan tertentu\n"
         "/stok — lihat & toggle stok menu\n"
         "/menu — daftar harga menu\n"
+        "/buka — buka warung \\(terima order\\)\n"
+        "/tutup — tutup warung \\(blok checkout\\)\n"
         "/push \\<user\\_id\\> \\[pesan\\] — kirim promo ke user",
         parse_mode="MarkdownV2",
+    )
+
+
+async def cmd_buka(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+    if not await _is_owner(update):
+        return
+    set_setting("shop_open", "1")
+    await update.message.reply_text("🔓 Warung DIBUKA — order bisa masuk lagi.")
+
+
+async def cmd_tutup(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+    if not await _is_owner(update):
+        return
+    set_setting("shop_open", "0")
+    await update.message.reply_text(
+        "🔒 Warung DITUTUP — checkout diblok.\n"
+        "Order yang udah masuk tetap bisa diproses. /buka untuk buka lagi."
     )
 
 
@@ -307,9 +337,13 @@ async def callback_handler(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
                 reply_markup=_order_keyboard(o["id"], o["status"], o["payment_status"]),
             )
             try:
+                msg = CUSTOMER_STATUS_MSG.get(
+                    o["status"],
+                    f"*Order #{o['id']}* diperbarui\nStatus: {result['label']}",
+                ).format(id=o["id"])
                 await ctx.bot.send_message(
                     chat_id=o["user_id"],
-                    text=f"*Order #{o['id']}* diperbarui\nStatus: {result['label']}",
+                    text=msg,
                     parse_mode="Markdown",
                 )
             except Exception as e:
@@ -327,6 +361,14 @@ async def callback_handler(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
                 parse_mode="Markdown",
                 reply_markup=_order_keyboard(o["id"], o["status"], o["payment_status"]),
             )
+            try:
+                await ctx.bot.send_message(
+                    chat_id=o["user_id"],
+                    text=f"💵 *Pembayaran Order #{o['id']} diterima.*\nTerima kasih! 🙏",
+                    parse_mode="Markdown",
+                )
+            except Exception as e:
+                log.warning(f"Gagal kirim notif lunas ke {o['user_id']}: {e}")
         else:
             await query.answer(result["error"], show_alert=True)
 
@@ -371,6 +413,8 @@ def build_application() -> Application:
     app.add_handler(CommandHandler("omzet",   cmd_omzet))
     app.add_handler(CommandHandler("stok",    cmd_stok))
     app.add_handler(CommandHandler("menu",    cmd_menu))
+    app.add_handler(CommandHandler("buka",    cmd_buka))
+    app.add_handler(CommandHandler("tutup",   cmd_tutup))
     app.add_handler(CommandHandler("push",    cmd_push))
     app.add_handler(MessageHandler(filters.PHOTO, handle_payment_proof))
     app.add_handler(CallbackQueryHandler(callback_handler))

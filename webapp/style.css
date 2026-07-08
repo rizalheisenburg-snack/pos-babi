@@ -621,3 +621,31 @@ html, body {
 .detail-total { font-size: 16px; font-weight: 800; color: var(--text); }
 .detail-total span:last-child { color: var(--blue2); }
 .detail-note { color: var(--hint); font-size: 13px; margin-top: 10px; }
+
+/* ── Cancel order ─────────────────────────────────────────────── */
+.btn-cancel {
+  width: 100%; margin-top: 16px; padding: 14px;
+  background: rgba(248, 113, 113, .12);
+  color: var(--red);
+  border: 1.5px solid rgba(248, 113, 113, .4);
+  border-radius: 15px;
+  font-size: 14.5px; font-weight: 800; cursor: pointer;
+  transition: opacity .15s;
+}
+.btn-cancel:active { opacity: .7; }
+.cancel-hint {
+  text-align: center; color: var(--hint); font-size: 12px; margin-top: 8px;
+}
+
+/* ── Banner warung tutup ──────────────────────────────────────── */
+.closed-banner {
+  margin: 12px 16px 0;
+  padding: 12px 16px;
+  background: rgba(251, 191, 36, .12);
+  border: 1px solid rgba(251, 191, 36, .35);
+  border-radius: 14px;
+  color: #FBBF24;
+  font-size: 13.5px; font-weight: 700;
+  text-align: center;
+}
+.closed-banner.hidden { display: none; }

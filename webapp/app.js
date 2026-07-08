@@ -49,19 +49,25 @@ function categoryColor(name) {
   return `hsl(${hue}, 42%, 24%)`;
 }
 
+const usd = n => `≈ $${(n / 4000).toFixed(2)}`;
+
 function menuCardHtml(item) {
   const qty = cart[item.id]?.qty || 0;
   return `
     <div class="menu-card">
+      <div class="menu-visual">${item.emoji || "🍽️"}</div>
       <div class="menu-info">
+        <div class="menu-cat">${item.category || ""}</div>
         <div class="menu-name">${item.name}</div>
         ${item.description ? `<div class="menu-desc">${item.description}</div>` : ""}
-        <div class="menu-price">${riel(item.price)}</div>
       </div>
-      <div class="qty-control">
-        <button class="qty-btn minus" data-id="${item.id}">−</button>
-        <span class="qty-num" id="qty-${item.id}">${qty}</span>
-        <button class="qty-btn plus" data-id="${item.id}">+</button>
+      <div class="menu-foot">
+        <div class="menu-price">${riel(item.price)}<small>${usd(item.price)}</small></div>
+        <div class="qty-control ${qty ? "" : "empty"}" id="ctrl-${item.id}">
+          <button class="qty-btn minus" data-id="${item.id}">−</button>
+          <span class="qty-num" id="qty-${item.id}">${qty}</span>
+          <button class="qty-btn plus" data-id="${item.id}">+</button>
+        </div>
       </div>
     </div>`;
 }
@@ -81,7 +87,7 @@ function renderControls() {
         <span class="search-icon">🔍</span>
         <input id="menu-search" class="menu-search" type="search" placeholder="Cari menu..." value="${searchQuery}" autocomplete="off" />
       </div>
-      ${showBack ? `<button id="btn-back-cats" class="btn-cats-back">Semua Kategori</button>` : ""}
+      ${showBack ? `<button id="btn-back-cats" class="btn-cats-back">‹ Semua</button>` : ""}
     </div>
   `;
   document.getElementById("menu-search").addEventListener("input", e => {
@@ -119,13 +125,16 @@ function renderList() {
     const fallbackEmoji = menu[cat][0]?.emoji || "🍽️";
     return `
       <button class="category-card" data-cat="${cat}">
-        <div class="category-visual" style="background:${categoryColor(cat)}">
+        <div class="category-visual">
           <img src="cat/${slug}.jpg" alt="${cat}" loading="lazy"
                onload="this.nextElementSibling.style.display='none'"
                onerror="this.style.display='none'" />
           <div class="category-fallback">${fallbackEmoji}</div>
         </div>
-        <div class="category-name">${cat}</div>
+        <div class="category-meta">
+          <div class="category-name">${cat}</div>
+          <div class="category-count">${menu[cat].length} menu</div>
+        </div>
       </button>`;
   }).join("");
 }
@@ -167,6 +176,7 @@ menuList.addEventListener("click", e => {
     if (cart[id].qty === 0) delete cart[id];
   }
   document.getElementById(`qty-${id}`).textContent = cart[id]?.qty || 0;
+  document.getElementById(`ctrl-${id}`)?.classList.toggle("empty", !cart[id]?.qty);
   updateCartFab();
 });
 

@@ -12,5 +12,5 @@ SECRET_KEY: str = os.getenv("SECRET_KEY", BOT_TOKEN)
 
 from pathlib import Path
 BASE_DIR = Path(__file__).parent
-ABA_QR_IMAGE_PATH: str = str(BASE_DIR / "webapp" / "aba_mate.jpg")
+ABA_QR_IMAGE_PATH: str = str(BASE_DIR / "webapp" / "aba-mat-baru.jpg")
 VOUCHER_QR_IMAGE_PATH: str = str(BASE_DIR / "webapp" / "voucer.jpg")

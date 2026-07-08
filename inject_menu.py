@@ -71,14 +71,23 @@ MENU = [
 ("Ayam Mayonaise", "", 12000, "Ayam", "🍗", None),
 ("Ayam Asam Manis", "", 12000, "Ayam", "🍗", None),
 
-# ── UDANG / CUMI ──────────────────────────────────────────
-("Udang / Cumi Mentega", "", 15000, "Udang / Cumi", "🦐", None),
-("Udang / Cumi Goreng Tepung", "", 15000, "Udang / Cumi", "🦐", None),
-("Udang / Cumi Rica", "", 15000, "Udang / Cumi", "🦐", None),
-("Udang / Cumi Lada Garam", "", 15000, "Udang / Cumi", "🦐", None),
-("Udang / Cumi Lada Hitam", "", 15000, "Udang / Cumi", "🦐", None),
-("Udang / Cumi Mayonaise", "", 15000, "Udang / Cumi", "🦐", None),
-("Udang / Cumi Asam Manis", "", 15000, "Udang / Cumi", "🦐", None),
+# ── UDANG ─────────────────────────────────────────────────
+("Udang Mentega", "", 15000, "Udang", "🦐", None),
+("Udang Goreng Tepung", "", 15000, "Udang", "🦐", None),
+("Udang Rica", "", 15000, "Udang", "🦐", None),
+("Udang Lada Garam", "", 15000, "Udang", "🦐", None),
+("Udang Lada Hitam", "", 15000, "Udang", "🦐", None),
+("Udang Mayonaise", "", 15000, "Udang", "🦐", None),
+("Udang Asam Manis", "", 15000, "Udang", "🦐", None),
+
+# ── CUMI ──────────────────────────────────────────────────
+("Cumi Mentega", "", 15000, "Cumi", "🦑", None),
+("Cumi Goreng Tepung", "", 15000, "Cumi", "🦑", None),
+("Cumi Rica", "", 15000, "Cumi", "🦑", None),
+("Cumi Lada Garam", "", 15000, "Cumi", "🦑", None),
+("Cumi Lada Hitam", "", 15000, "Cumi", "🦑", None),
+("Cumi Mayonaise", "", 15000, "Cumi", "🦑", None),
+("Cumi Asam Manis", "", 15000, "Cumi", "🦑", None),
 
 # ── SAPI / IKAN ───────────────────────────────────────────
 ("Sapi Lada Hitam", "", 15000, "Sapi / Ikan", "🥩", None),

@@ -146,6 +146,30 @@ MENU = [
 ("Pocari Sweat 500ml", "", 6_000, "Minuman", "🥤", None),
 ("Liang Teh Kaleng",   "", 4_000, "Minuman", "🥤", None),
 ("Coca Cola",          "", 4_000, "Minuman", "🥤", None),
+("Fanta Orange",       "", 4_000, "Minuman", "🥤", None),
+("Fanta Grape",        "", 4_000, "Minuman", "🥤", None),
+("Sprite",             "", 4_000, "Minuman", "🥤", None),
+("Bir Cambodia",       "", 6_000, "Minuman", "🍺", None),
+("Angkor Beer Botol",  "", 10_000, "Minuman", "🍺", None),
+
+# ── MENU WARTEG ───────────────────────────────────────────
+("Babi Rica Rica",        "", 10_000, "Menu Warteg", "🍛", None),
+("Babi Cabe Ijo",         "", 10_000, "Menu Warteg", "🍛", None),
+("Babi Lada Hitam",       "", 10_000, "Menu Warteg", "🍛", None),
+("Babi Casio",            "", 10_000, "Menu Warteg", "🍛", None),
+("Samcan Sambal Ijo",     "", 10_000, "Menu Warteg", "🍛", None),
+("Babi Semur",            "", 10_000, "Menu Warteg", "🍛", None),
+("Telor Semur",           "", 3_000,  "Menu Warteg", "🍛", None),
+("Tahu Semur",            "", 3_000,  "Menu Warteg", "🍛", None),
+("Sapo Tahu Polos",       "", 4_000,  "Menu Warteg", "🍛", None),
+("Cah Toge",              "", 4_000,  "Menu Warteg", "🍛", None),
+("Buncis Babi",           "", 4_000,  "Menu Warteg", "🍛", None),
+("Mun Tahu Babi",         "", 5_000,  "Menu Warteg", "🍛", None),
+("Sayur Asin Bakut 3pcs", "", 15_000, "Menu Warteg", "🍛", None),
+("Sayur Capcai Polos",    "", 4_000,  "Menu Warteg", "🍛", None),
+("Babi Kecap",            "", 10_000, "Menu Warteg", "🍛", None),
+("Sayur Asin Tahu",       "", 4_000,  "Menu Warteg", "🍛", None),
+("Fuyunghai Babi",        "", 5_000,  "Menu Warteg", "🍛", None),
 ]
 
 

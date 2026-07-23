@@ -1,0 +1,149 @@
+#  [TEST PLAN] Projek Warteg Babi (POS & Order System)
+
+> 💡 **PROJECT OVERVIEW**
+**Nama Projek:** Warteg Babi POS & Order System
+**Versi:** v1.0
+**QA Lead:** @Rizal
+**Target Release:09 agustus 2026**
+**Status Dokumen:** 🟡 IN REVIEW
+> 
+
+---
+
+## 📌 1. Introduction
+
+Dokumen Test Plan ini menetapkan strategi, ruang lingkup, sumber daya, dan jadwal pengujian untuk **Projek Warteg Babi**. Tujuan utamanya adalah memastikan sistem kasir (POS), pemesanan, kalkulasi harga, dan manajemen stok berjalan 100% akurat dan stabil saat digunakan dalam operasional warteg.
+
+### 1.1 Scope (Cakupan Pengujian)
+
+#### 🎯 In Scope (Fitur yang Diuji)
+
+| Modul / Fitur | Akses Role | Skenario Pengujian Utama |
+| --- | --- | --- |
+| **Manajemen Menu & Harga** | Admin / Kasir | Tambah/Edit/Hapus menu (Babi balado,babi cabe ijo dll), ubah harga, toggle stok habis. |
+| **Pemesanan / POS Kasir** | Kasir / Waiter | Input order dine-in/takeaway, variasi lauk, cetak struk, kalkulasi total + voucer |
+| **Pembayaran (Payment)** | Kasir / Pelanggan | Transaksi Cash, QRIS, Transfer,voucer kalkulasi kembalian, serta void/pembatalan transaksi. |
+| **Laporan Penjualan** | Owner / Admin | Rekap omzet harian/bulanan, laporan lauk terlaris, ekspor ke PDF/Excel. |
+|  |  |  |
+
+#### 🚫 Out of Scope (TIDAK Diuji)
+
+- Jaringan internet / Wi-Fi lokasi warteg.
+- Integrasi ke layanan pihak ketiga yang belum di-support versi ini.
+- Perangkat keras kasir yang rusak fisik (printer rusak, tablet pecah).
+
+---
+
+### 1.2 Quality Objectives
+
+> 🎯 **TARGET KUALITAS:**
+> 
+> - **Kalkulasi 100% Akurat:** Tidak boleh ada selisih 1 sen pun pada kalkulasi kasir/pembayaran.
+> - **Performa:** Aplikasi POS tidak boleh *lag* atau *crash* saat antrean pesanan padat.
+> - **Zero Critical Defect:** 0 bug kategori Blocker/Critical saat naik ke produksi.
+
+---
+
+### 1.3 Roles & Responsibilities
+
+| Role | Personel | Tanggung Jawab |
+| --- | --- | --- |
+| **QA Lead** | @Darmi | Rencana pengujian, koordinasi tim, sign-off rilis. |
+| **QA Tester** | @Rizal | Membuat test case, eksekusi manual, laporan bug. |
+| **Developer** | @Agus | Fixing bug & build update. |
+| **Warteg Owner** | @Matew | UAT (User Acceptance Test) & feedback bisnis. |
+
+---
+
+## 🧪 2. Test Methodology
+
+### 2.1 Overview & Levels
+
+> ▶️ **Pendekatan Pengujian:** Agile Sprints
+> 
+
+> 🔽 **Functional Testing**
+Memastikan fitur input pesanan, hitung kembalian, dan manajemen stok berjalan sesuai spec.
+> 
+
+> 🔽 **Integration Testing**
+Memastikan transaksi di POS kasir langsung memotong stok di modul Dapur dan mencatat rekap di Laporan Owner.
+> 
+
+> 🔽 **User Acceptance Testing (UAT)**
+Simulasi riil transaksi bersama Kasir/Owner warteg sebelum sistem dipakai untuk jualan.
+> 
+
+---
+
+### 2.2 Bug Triage & Severity Definition
+
+- **Critical / Blocker:** Aplikasi crash total, transaksi gagal tersimpan, kalkulasi harga salah. *(Fix ASAP)*
+- **Major:** Fitur gagal tapi ada *workaround* (misal: gagal cetak resi otomatis tapi bisa cetak manual).
+- **Minor:** Isu UI/UX, typo nama menu, warna button kurang pas.
+
+---
+
+### 2.3 Suspension & Resumption Criteria
+
+> 🛑 **SUSPEND TEST:** Jika ditemukan bug *Blocker* (misal: Kasir tidak bisa pencet tombol bayar sama sekali) atau 40% test case gagal.
+> 
+> 
+> ▶️ **RESUME TEST:** Setelah tim Dev merilis hotfix dan masalah *Blocker* terverifikasi aman.
+> 
+
+---
+
+### 2.4 Test Completeness (Exit Criteria)
+
+- [ ]  100% test case kritikal telah dieksekusi.
+- [ ]  Pass rate pengujian mencapai minimal **95%**.
+- [ ]  **0 Critical / Blocker Defects** yang masih *open*.
+
+---
+
+### 2.5 Tasks & Estimation
+
+| Task | Assignee | Estimasi (Hours) |
+| --- | --- | --- |
+| Test Case Design | QA Tester | 16 Hours |
+| Test Execution (Round 1 & 2) | QA Tester | 24 Hours |
+| Bug Reporting & Verification | QA Tester & Dev | 12 Hours |
+| UAT & Test Summary Report | QA Lead | 4 Hours |
+
+---
+
+## 📦 3. Test Deliverables
+
+- [ ]  Dokumen Test Plan
+- [ ]  Test Cases / Scenario Sheet
+- [ ]  Bug / Defect Log
+- [ ]  Test Execution Report & Sign-Off Document
+
+---
+
+## 🛠️ 4. Resource & Environment Needs
+
+### 4.1 Tools & Devices
+
+> 📱 **Hardware Test:**
+> 
+> - Tablet POS Kasir (Android / iPad)
+> - Printer Thermal Struk (Bluetooth / USB)
+> - Drawer Kasir (Cash Drawer)
+
+> 🧰 **Software Tools:**
+> 
+> - Bug Tracker: Notion / Jira
+> - DB Client: DBeaver / Postman (API Test)
+
+---
+
+## 📖 5. Terms & Acronyms
+
+| Term | Definisi |
+| --- | --- |
+| **POS** | *Point of Sale* (Aplikasi kasir transaksi) |
+| **AUT** | *Application Under Test* (Aplikasi Warteg Babi) |
+| **UAT** | *User Acceptance Testing* (Tes langsung oleh Owner Warteg) |
+| **Void** | Pembatalan item / transaksi yang sudah terlanjur di-input |

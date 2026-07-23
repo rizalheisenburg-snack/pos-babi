@@ -14,6 +14,7 @@ MENU = [
 ("Ricebowl Babi Lada Garam", "", 12000, "Babi & Samcan", "🐷", None),
 ("Ricebowl Samcan Kecap", "", 12000, "Babi & Samcan", "🐷", None),
 
+
 # ── NASI GORENG ───────────────────────────────────────────
 ("Nasi Goreng Telor", "", 10000, "Nasi Goreng", "🍳", None),
 ("Nasi Goreng Ayam", "", 12000, "Nasi Goreng", "🍳", None),
